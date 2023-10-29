@@ -90,11 +90,11 @@ function FretboardSection() {
 
 export default function() {
     return (
-        <div className="app-container">
+        <>
             <ModeSelector></ModeSelector>
             <LookUp></LookUp>
             <DetailsSection></DetailsSection>
             <FretboardSection></FretboardSection>
-        </div>
+        </>
     )
 }
