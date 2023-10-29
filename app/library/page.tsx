@@ -1,16 +1,24 @@
-export default function() {
+
+function ModeSelector() {
     return (
-        <div className="app-container">
         <div className="toggle-buttons">
             <button id="scaleModeBtn">Scale Mode</button>
             <button id="chordModeBtn" className="active">Chord Mode</button>
         </div>
+    )
+}
 
+function LookUp() {
+    return (
         <div className="search-section">
           <input type="text" id="searchInput" placeholder="Search for a chord..." />
           <button id="searchBtn">Search</button>
         </div>
+    )
+}
 
+function DetailsSection() {
+    return (
         <div className="details-section">
           <div className="scale-diagram" style={{display: 'none'}}>
               {/* Scale Diagram  */}
@@ -26,7 +34,11 @@ export default function() {
               <p>Diagram or interactive element for C Major chord goes here.</p>
           </div>
         </div>
+    )
+}
 
+function FretboardSection() {
+    return (
         <div className="fretboard-section">
             {/* Full Fretboard Diagram */}
             <svg id="full-fretboard" viewBox="0 0 1100 150" xmlns="http://www.w3.org/2000/svg">
@@ -73,6 +85,16 @@ export default function() {
             <circle cx="525" cy="20" r="5" fill="red"/> 
             </svg>
         </div>
-    </div>
+    )
+}
+
+export default function() {
+    return (
+        <div className="app-container">
+            <ModeSelector></ModeSelector>
+            <LookUp></LookUp>
+            <DetailsSection></DetailsSection>
+            <FretboardSection></FretboardSection>
+        </div>
     )
 }
