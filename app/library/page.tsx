@@ -1,11 +1,24 @@
+"use client"
 
-function ModeSelector() {
+import { useState } from "react"
+
+
+type ModeSelectorProps = {
+    chordMode: boolean;
+    setChordMode: React.Dispatch<React.SetStateAction<boolean>>;
+  };
+  
+function ModeSelector({ chordMode, setChordMode }: ModeSelectorProps) {
     return (
         <div className="toggle-buttons">
-            <button id="scaleModeBtn">Scale Mode</button>
-            <button id="chordModeBtn" className="active">Chord Mode</button>
+            <button id="scaleModeBtn" onClick={() => setChordMode(false)} className={!chordMode ? "active" : ""}>
+                Scale Mode
+            </button>
+            <button id="chordModeBtn" onClick={() => setChordMode(true)} className={chordMode ? "active" : ""}>
+                Chord Mode
+            </button>
         </div>
-    )
+    );
 }
 
 function LookUp() {
@@ -17,25 +30,28 @@ function LookUp() {
     )
 }
 
-function DetailsSection() {
+function DetailsSection({useChordMode}: {useChordMode: boolean}) {
+    console.log(useChordMode);
+    if (useChordMode){
+        return (
+            <div className="chord-diagram">
+                {/* Chord Diagram */}
+                <h2>C Major Chord Diagram</h2>
+                {/* Placeholder for C Major Chord Diagram */}
+                <p>Diagram or interactive element for C Major chord goes here.</p>
+            </div>
+        )
+    }
     return (
-        <div className="details-section">
-          <div className="scale-diagram" style={{display: 'none'}}>
-              {/* Scale Diagram  */}
-              <h2>C Major Scale Diagram</h2>
-              {/* Placeholder for C Major Chord Diagram */}
-              <p>Diagram or interactive element for C Major chord goes here.</p>
-          </div>
-          
-          <div className="chord-diagram">
-              {/* Chord Diagram */}
-              <h2>C Major Chord Diagram</h2>
-              {/* Placeholder for C Major Chord Diagram */}
-              <p>Diagram or interactive element for C Major chord goes here.</p>
-          </div>
-        </div>
+            (<div className="scale-diagram">
+                {/* Scale Diagram  */}
+                <h2>C Major Scale Diagram</h2>
+                {/* Placeholder for C Major Chord Diagram */}
+                <p>Diagram or interactive element for C Major chord goes here.</p>
+            </div>)
     )
 }
+   
 
 function FretboardSection() {
     return (
@@ -88,12 +104,14 @@ function FretboardSection() {
     )
 }
 
-export default function() {
+export default function Library() {
+    let [chordMode, setChordMode] = useState(false); 
+
     return (
         <>
-            <ModeSelector></ModeSelector>
+            <ModeSelector chordMode={chordMode} setChordMode={setChordMode} />
             <LookUp></LookUp>
-            <DetailsSection></DetailsSection>
+            <DetailsSection useChordMode={chordMode}></DetailsSection>
             <FretboardSection></FretboardSection>
         </>
     )
