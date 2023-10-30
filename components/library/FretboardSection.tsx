@@ -20,6 +20,56 @@ interface FretboardParams {
     nutWidth: number;
 }
 
+const NUMBER_OF_FRETS = 22;
+const FLAT_SYMBOL = String.fromCharCode(9837);
+const STRING_NOTES = [ 'E_LOW', 'A', 'D', 'G', 'B', 'E_HIGH' ];
+const ALL_NOTES = [ 'A', 'B' + FLAT_SYMBOL, 'B', 'C', 'C#', 'D', 'E' + FLAT_SYMBOL, 'E', 'F', 'F#', 'G', 'G#' ];
+const MAP_STRINGS_TO_STRINGNUMBER: {[index: string]: number} = {
+        E_LOW: 6, A: 5, D: 4, G: 3, B: 2, E_HIGH: 1
+};
+const intervalForScaleType: {[index: string]: string} = {
+    major: '0,2,4,5,7,9,11', minor: '0,2,3,5,7,8,10', pentatonic: '0,3,5,7,10',
+    harmonicMinor: '0,2,3,5,7,8,11'
+};
+
+const orderNotesForStartingNote = (startingNote: string) => {
+    if (startingNote == 'E_LOW' || startingNote == 'E_HIGH') { // TODO: move this check
+        startingNote = 'E';
+    }
+    let reorderedNotes = [...ALL_NOTES];
+    return [...reorderedNotes.splice(ALL_NOTES.indexOf(startingNote)), ...reorderedNotes];
+}
+
+const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: FretboardParams)  => {
+    let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName];
+        let notesForString = orderNotesForStartingNote(stringName);
+        for (let i = 0; i <= NUMBER_OF_FRETS; i++) {
+            let j = i % 12;
+            if (notes.indexOf(notesForString[j]) > -1){
+                // drawNoteOnString(i, stringNumber, notesForString[j], notesForString[j] == rootNote);
+                drawNote(ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams);
+            }
+        }
+}
+
+const notesFromScaleInterval = (keyName: string, intervals: string) => {
+    let allNotes: string[] = orderNotesForStartingNote(keyName);
+        let intervalValues: number[] = intervals.split(',').map(x => parseInt(x));
+        let scaleNotes: string[] = [];
+        for (let i = 0; i < allNotes.length; i++) {
+            if (intervalValues.indexOf(i) > -1) {
+                scaleNotes.push(allNotes[i]);
+            }
+        }
+        return scaleNotes;
+}
+
+const addNotesToNeck = (selectedKey: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: FretboardParams) => {
+    for (let i = 0; i < STRING_NOTES.length; i++){
+        drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(selectedKey, scaleInterval), selectedKey, fretboardParams);
+    }
+}
+
 const drawFretboardElements = (
   ctx: CanvasRenderingContext2D,
   fretboardParams: FretboardParams
@@ -60,8 +110,8 @@ const drawFretboardElements = (
     const markingX = fretboardX + fret * fretWidth - fretWidth / 2;
     if (fret === 12) {
       ctx.beginPath();
-      ctx.arc(markingX, markingY - fretMarkingRadius * 3, fretMarkingRadius, 0, 2 * Math.PI);
-      ctx.arc(markingX, markingY + fretMarkingRadius * 3, fretMarkingRadius, 0, 2 * Math.PI);
+      ctx.arc(markingX, markingY - fretMarkingRadius * 4, fretMarkingRadius, 0, 2 * Math.PI);
+      ctx.arc(markingX, markingY + fretMarkingRadius * 4, fretMarkingRadius, 0, 2 * Math.PI);
       ctx.fillStyle = fretMarkingColor;
       ctx.fill();
       ctx.closePath();
@@ -84,6 +134,7 @@ const drawNote = (
   string: number,
   fret: number,
   label: string,
+  isRoot: boolean,
   fretboardParams: FretboardParams
 ) => {
   const { fretboardX, fretboardY, numStrings, stringSpacing, fretWidth, nutWidth } = fretboardParams;
@@ -100,7 +151,7 @@ const drawNote = (
 
   ctx.beginPath();
   ctx.arc(noteX, noteY, noteRadius, 0, 2 * Math.PI);
-  ctx.fillStyle = 'red';
+  ctx.fillStyle = isRoot ? 'blue' : 'red';
   ctx.fill();
   ctx.closePath();
 
@@ -144,7 +195,7 @@ export default function FretboardSection() {
             const fretboardHeight = height * 0.6;
             const fretboardX = (width - fretboardWidth) / 2;
             const fretboardY = (height - fretboardHeight) / 2;
-            const numFrets = 22;
+            const numFrets = NUMBER_OF_FRETS;
             const numStrings = 6;
             const stringSpacing = fretboardHeight / (numStrings - 1);
             const fretWidth = fretboardWidth / numFrets;
@@ -166,15 +217,8 @@ export default function FretboardSection() {
 
             drawFretboardElements(ctx, fretboardParams);
 
-            // Example notes
-            const notes: Note[] = [
-                { string: 3, fret: 2, label: 'A' },
-                { string: 1, fret: 3, label: 'G' },
-                { string: 4, fret: 7, label: 'D' },
-                { string: 6, fret: 0, label: 'E' }, // Open string note
-            ];
-
-            notes.forEach(note => drawNote(ctx, note.string, note.fret, note.label, fretboardParams));
+            // Example notes - draw c major scale
+            addNotesToNeck('C', intervalForScaleType['major'], ctx, fretboardParams);
     }
 };
 
