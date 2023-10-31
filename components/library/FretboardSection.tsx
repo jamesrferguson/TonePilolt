@@ -155,7 +155,7 @@ const drawNote = (
   fretboardParams: FretboardParams
 ) => {
   const { fretboardX, fretboardY, numStrings, stringSpacing, fretWidth, nutWidth } = fretboardParams;
-  const noteRadius = fretboardParams.width * 0.007;
+  const noteRadius = fretboardParams.width * 0.009;
 
   let noteX;
   let noteY = fretboardY + (numStrings - string) * stringSpacing;
@@ -173,8 +173,8 @@ const drawNote = (
   ctx.closePath();
 
   ctx.fillStyle = 'white';
-  ctx.font = `${noteRadius * 1.5}px Arial`;
-  ctx.fillText(label, noteX - noteRadius / 2, noteY + noteRadius / 2);
+  ctx.font = `${noteRadius * 1.15}px Arial`;
+  ctx.fillText(label, noteX - noteRadius / 2, noteY + noteRadius / 5);
 };
 
 const useCanvasResize = (drawFretboard: (ctx: CanvasRenderingContext2D) => void, containerRef: React.RefObject<HTMLDivElement>) => {
