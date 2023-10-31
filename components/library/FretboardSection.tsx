@@ -23,6 +23,7 @@ interface FretboardParams {
 const NUMBER_OF_FRETS = 22;
 const FLAT_SYMBOL = String.fromCharCode(9837);
 const STRING_NOTES = [ 'E_LOW', 'A', 'D', 'G', 'B', 'E_HIGH' ];
+const STRING_LABELS = [ 'E', 'B', 'G', 'D', 'A', 'E' ];
 const ALL_NOTES = [ 'A', 'B' + FLAT_SYMBOL, 'B', 'C', 'C#', 'D', 'E' + FLAT_SYMBOL, 'E', 'F', 'F#', 'G', 'G#' ];
 const MAP_STRINGS_TO_STRINGNUMBER: {[index: string]: number} = {
         E_LOW: 6, A: 5, D: 4, G: 3, B: 2, E_HIGH: 1
@@ -127,6 +128,22 @@ const drawFretboardElements = (
   // Draw guitar nut
   ctx.fillStyle = fretColor;
   ctx.fillRect(fretboardX - nutWidth, fretboardY, nutWidth, fretboardHeight);
+
+  // Label the guitar string above the nut
+  STRING_LABELS.forEach((stringNote, idx) => {
+    const stringLabelY = fretboardY + idx * stringSpacing;  // adjusted for better alignment
+    ctx.fillStyle = 'black';
+    ctx.textBaseline = 'middle';  // this sets the vertical alignment to the middle
+    ctx.font = `${width * 0.01}px Arial`;
+    ctx.fillText(stringNote, fretboardX - nutWidth - (width * 0.03), stringLabelY);  // adjust the value 0.04 as needed
+});
+
+  // Print the fret numbers along the bottom edge of the fretboard
+  for (let i = 1; i <= numFrets; i++) {
+    ctx.fillStyle = 'black';
+    ctx.font = `${width * 0.015}px Arial`;
+    ctx.fillText(i.toString(), fretboardX + i * fretWidth - fretWidth / 2 - (width * 0.005), fretboardY + fretboardHeight + (width * 0.025)); // adjust the value 0.005 and 0.025 as needed
+  }
 };
 
 const drawNote = (
@@ -191,7 +208,7 @@ export default function FretboardSection() {
         if (containerRef.current) {
             const width = containerRef.current.offsetWidth;
             const height = width / 4.3333;
-            const fretboardWidth = width * 0.95;
+            const fretboardWidth = width * 0.85;
             const fretboardHeight = height * 0.6;
             const fretboardX = (width - fretboardWidth) / 2;
             const fretboardY = (height - fretboardHeight) / 2;
@@ -218,7 +235,7 @@ export default function FretboardSection() {
             drawFretboardElements(ctx, fretboardParams);
 
             // Example notes - draw c major scale
-            addNotesToNeck('C', intervalForScaleType['major'], ctx, fretboardParams);
+            addNotesToNeck('A', intervalForScaleType['major'], ctx, fretboardParams);
     }
 };
 
