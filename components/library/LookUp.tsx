@@ -1,4 +1,4 @@
-import {useState, useEffect, ChangeEvent} from 'react';
+import {useState, useEffect, useRef, ChangeEvent} from 'react';
 
 
 interface LookUpProps {
@@ -8,6 +8,9 @@ interface LookUpProps {
 function LookUp ({chords}: LookUpProps) {
   const [query, setQuery] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
@@ -27,10 +30,29 @@ function LookUp ({chords}: LookUpProps) {
     setSuggestions([]);
   };
 
+  useEffect(() => {
+    // Add event listener to document
+    document.addEventListener('mousedown', handleDocumentClick);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      document.removeEventListener('mousedown', handleDocumentClick);
+    };
+  }, []);
+
+  const handleDocumentClick = (event: MouseEvent) => {
+    if (
+      inputRef.current && !inputRef.current.contains(event.target as Node) &&
+      suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)
+    ) {
+      setSuggestions([]);
+    }
+  };
+  
   return (
       <div className="search-section">
-        <input type="text" id="searchInput" onChange={handleInputChange} placeholder="Search for a chord..." value={query} />
-        <div className="suggestions">
+        <input ref={inputRef} type="text" id="searchInput" onChange={handleInputChange} placeholder="Search for a chord..." value={query} />
+        <div ref={suggestionsRef} className="suggestions">
         {suggestions.map((suggestion, index) => (
           <div key={index} onClick={() => handleSuggestionClick(suggestion)}>
             {suggestion}
