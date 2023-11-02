@@ -76,14 +76,51 @@ button.active {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+.search-section {
+  position: relative; 
+}
+
 .search-section input {
   padding: 10px;
   font-size: 16px;
   width: 70%;
+  box-sizing: border-box; 
+  margin: 0;  /* Ensure there's no margin affecting the positioning */
+  border: none;  /* Ensure there's no border affecting the width */
 }
 
 .search-section button {
   padding: 10px 20px;
   font-size: 16px;
+}
+
+.suggestions {
+  width: 70%; /* Adjusting for 10px padding on both sides */
+  max-height: 150px;
+  overflow-y: auto;
+  position: absolute; 
+  top: 100%; 
+  left: 10%;  
+  background-color: #fff;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.suggestions div {
+  width: 100%;  /* Subtracting the padding from both sides */
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.3s ease;
+  box-sizing: border-box;  /* This will ensure padding doesn't add to the total width */
+}
+
+.suggestions div:last-child {
+  border-bottom: none; 
+}
+
+.suggestions div:hover {
+  background-color: #f6f6f6; 
 }
 
