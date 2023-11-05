@@ -1,29 +1,47 @@
+import { type } from 'os';
 import {useState, useEffect, useRef, ChangeEvent} from 'react';
 
 
-interface LookUpProps {
+type LookUpProps = {
   chords: string[];
+  scales: string[];
+  chordMode: boolean;
+  setActiveScale: React.Dispatch<React.SetStateAction<string>>;
+  setActiveChord: React.Dispatch<React.SetStateAction<string>>;
+  setSearchClicked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function LookUp ({chords}: LookUpProps) {
+function LookUp ({chords, scales, chordMode, setActiveChord, setActiveScale, setSearchClicked}: LookUpProps) {
+  let [currentInputText, setInputText] = useState("");
+
   const [query, setQuery] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [lookUpList, setLookupList] = useState<string[]>(chords);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
+    setInputText(e.target.value);
   };
 
   useEffect(() => {
     if (query) {
-      const filtered = chords.filter(chord => chord.toLowerCase().startsWith(query.toLowerCase()));
+      const filtered = lookUpList.filter(el => el.toLowerCase().startsWith(query.toLowerCase()));
       setSuggestions(filtered);
     }  else {
       setSuggestions([]);
     }
   }, [query]);
+
+  useEffect(() => {
+    if (chordMode) {
+      setLookupList(chords);
+    } else {
+      setLookupList(scales);
+    }
+  }, [chordMode]);
 
   const handleSuggestionClick = (suggestion: string) => {
     setQuery(suggestion);
@@ -49,6 +67,17 @@ function LookUp ({chords}: LookUpProps) {
     }
   };
   
+  const onSearchBtnClick = () => {
+    setSearchClicked(true);
+    if (chordMode) {
+      setActiveChord(query);
+      console.log("Setting active chord to: " + query);
+    } else {
+      setActiveScale(query);
+      console.log("Setting active scale to: " + query);
+    }
+  };
+
   return (
       <div className="search-section">
         <input ref={inputRef} type="text" id="searchInput" onChange={handleInputChange} placeholder="Search for a chord..." value={query} />
@@ -59,7 +88,7 @@ function LookUp ({chords}: LookUpProps) {
           </div>
         ))}
       </div>
-        <button id="searchBtn">Search</button>
+        <button id="searchBtn" onClick={onSearchBtnClick}>Search</button>
       </div>
   )
 }
