@@ -94,6 +94,12 @@ button.active {
   font-size: 16px;
 }
 
+#searchBtn:active {
+  background-color: #3A8D40; /* A darker shade of green for visual feedback */
+  color: white;
+  transform: scale(0.95); /* Slightly reduces the size of the button when pressed */
+}
+
 .suggestions {
   width: 70%; /* Adjusting for 10px padding on both sides */
   max-height: 150px;
