@@ -1,5 +1,4 @@
 function DetailsSection({useChordMode}: {useChordMode: boolean}) {
-    console.log(useChordMode);
     if (useChordMode){
         return (
             <div className="chord-diagram">

@@ -12,7 +12,6 @@ export default function Library() {
     let [chordMode, setChordMode] = useState(false);
     let [activeScale, setActiveScale] = useState("");
     let [activeChord, setActiveChord] = useState("");
-    const [searchClicked, setSearchClicked] = useState(false);
 
     /TODO delete - for testing only/
     //const chords = ["A", "Am", "B", "C", "D", "E", "Em"];
@@ -35,9 +34,9 @@ export default function Library() {
     return (
         <>
             <ModeSelector chordMode={chordMode} setChordMode={setChordMode} />
-            <LookUp chords={chords} scales={scales} chordMode={chordMode} setActiveScale={setActiveScale} setActiveChord={setActiveChord} setSearchClicked={setSearchClicked} />
+            <LookUp chords={chords} scales={scales} chordMode={chordMode} setActiveScale={setActiveScale} setActiveChord={setActiveChord} />
             <DetailsSection useChordMode={chordMode}></DetailsSection>
-            <FretboardSection />
+            <FretboardSection chordMode={chordMode} activeScale={activeScale} activeChord={activeChord}/>
         </>
     )
 };

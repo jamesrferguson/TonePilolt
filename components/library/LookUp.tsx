@@ -8,10 +8,9 @@ type LookUpProps = {
   chordMode: boolean;
   setActiveScale: React.Dispatch<React.SetStateAction<string>>;
   setActiveChord: React.Dispatch<React.SetStateAction<string>>;
-  setSearchClicked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function LookUp ({chords, scales, chordMode, setActiveChord, setActiveScale, setSearchClicked}: LookUpProps) {
+function LookUp ({chords, scales, chordMode, setActiveChord, setActiveScale}: LookUpProps) {
   let [currentInputText, setInputText] = useState("");
 
   const [query, setQuery] = useState<string>('');
@@ -68,13 +67,10 @@ function LookUp ({chords, scales, chordMode, setActiveChord, setActiveScale, set
   };
   
   const onSearchBtnClick = () => {
-    setSearchClicked(true);
     if (chordMode) {
       setActiveChord(query);
-      console.log("Setting active chord to: " + query);
     } else {
       setActiveScale(query);
-      console.log("Setting active scale to: " + query);
     }
   };
 

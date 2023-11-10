@@ -54,21 +54,24 @@ const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, n
 }
 
 const notesFromScaleInterval = (keyName: string, intervals: string) => {
-    let allNotes: string[] = orderNotesForStartingNote(keyName);
-        let intervalValues: number[] = intervals.split(',').map(x => parseInt(x));
-        let scaleNotes: string[] = [];
-        for (let i = 0; i < allNotes.length; i++) {
-            if (intervalValues.indexOf(i) > -1) {
-                scaleNotes.push(allNotes[i]);
+  if(keyName && intervals){
+      let allNotes: string[] = orderNotesForStartingNote(keyName);
+      let intervalValues: number[] = intervals.split(',').map(x => parseInt(x));
+      let scaleNotes: string[] = [];
+      for (let i = 0; i < allNotes.length; i++) {
+        if (intervalValues.indexOf(i) > -1) {
+            scaleNotes.push(allNotes[i]);
             }
         }
-        return scaleNotes;
+      return scaleNotes;
+  }
+  return [];
 }
 
 const addNotesToNeck = (selectedKey: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: FretboardParams) => {
     for (let i = 0; i < STRING_NOTES.length; i++){
         drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(selectedKey, scaleInterval), selectedKey, fretboardParams);
-    }
+            }
 }
 
 const drawFretboardElements = (
@@ -200,9 +203,63 @@ const useCanvasResize = (drawFretboard: (ctx: CanvasRenderingContext2D) => void,
       };
     }, [resizeCanvas]);
   }
-  
-export default function FretboardSection() {
+
+type FretboardProps = {
+  chordMode: boolean;
+  activeScale: string;
+  activeChord: string;
+}
+
+
+export default function FretboardSection({chordMode, activeScale, activeChord}:FretboardProps) {
     const containerRef = useRef<HTMLDivElement | null>(null);
+
+    // useEffect(() => {
+
+    //   if (containerRef.current && containerRef.current.children[0]) {
+    //     const canvas = containerRef.current.children[0] as HTMLCanvasElement;
+    //     const ctx = canvas.getContext('2d');
+    //     if (ctx) {
+    //       if (containerRef.current) {
+    //         const width = containerRef.current.offsetWidth;
+    //         const height = width / 4.3333;
+    //         const fretboardWidth = width * 0.85;
+    //         const fretboardHeight = height * 0.6;
+    //         const fretboardX = (width - fretboardWidth) / 2;
+    //         const fretboardY = (height - fretboardHeight) / 2;
+    //         const numFrets = NUMBER_OF_FRETS;
+    //         const numStrings = 6;
+    //         const stringSpacing = fretboardHeight / (numStrings - 1);
+    //         const fretWidth = fretboardWidth / numFrets;
+    //         const nutWidth = fretboardWidth * 0.02;
+
+    //         const fretboardParams = {
+    //             width,
+    //             height,
+    //             fretboardX,
+    //             fretboardY,
+    //             fretboardWidth,
+    //             fretboardHeight,
+    //             numFrets,
+    //             numStrings,
+    //             stringSpacing,
+    //             fretWidth,
+    //             nutWidth,
+    //         };
+
+    //         // if(chordMode) {
+    //         //   addNotesToNeck('D', intervalForScaleType['pentatonic'], ctx, fretboardParams);
+    //         // }
+    //         // else {
+    //         //   addNotesToNeck('E', intervalForScaleType['pentatonic'], ctx, fretboardParams);
+
+    //         // }
+    //       }
+      
+    //     }
+    //   }
+
+    // },[activeScale, activeChord]);
 
     const drawFretboard = (ctx: CanvasRenderingContext2D) => {
         if (containerRef.current) {
@@ -235,7 +292,12 @@ export default function FretboardSection() {
             drawFretboardElements(ctx, fretboardParams);
 
             // Example notes - draw c major scale
-            addNotesToNeck('A', intervalForScaleType['major'], ctx, fretboardParams);
+            if (chordMode && activeChord) {
+              addNotesToNeck(activeChord.split(' ')[0], intervalForScaleType[activeChord.split(' ')[1]], ctx, fretboardParams);
+            }
+            else if(!chordMode && activeScale){
+              addNotesToNeck(activeScale.split(' ')[0], intervalForScaleType[activeScale.split(' ')[1]], ctx, fretboardParams);
+            }
     }
 };
 
