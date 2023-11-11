@@ -32,6 +32,9 @@ const intervalForScaleType: {[index: string]: string} = {
     major: '0,2,4,5,7,9,11', minor: '0,2,3,5,7,8,10', pentatonic: '0,3,5,7,10',
     harmonicMinor: '0,2,3,5,7,8,11'
 };
+const intervalsForChordType: {[index: string]: string} = {
+  major: '0,4,7', minor: '0,3,7'
+};
 
 const orderNotesForStartingNote = (startingNote: string) => {
     if (startingNote == 'E_LOW' || startingNote == 'E_HIGH') { // TODO: move this check
@@ -47,7 +50,6 @@ const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, n
         for (let i = 0; i <= NUMBER_OF_FRETS; i++) {
             let j = i % 12;
             if (notes.indexOf(notesForString[j]) > -1){
-                // drawNoteOnString(i, stringNumber, notesForString[j], notesForString[j] == rootNote);
                 drawNote(ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams);
             }
         }
@@ -210,56 +212,35 @@ type FretboardProps = {
   activeChord: string;
 }
 
+function toCamelCase(words: string[]): string {
+  return words
+    .map((word, index) =>
+      index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    )
+    .join('');
+}
+
+interface UserScaleOrChordInput {
+  keyName: string;
+  chordOrScaleType: string;
+}
+
+function parseUserInput(input: string | undefined): UserScaleOrChordInput {
+  let keyName = "";
+  let chordOrScaleType = "";
+
+  if (input) {
+    const words = input.split(' ');
+    keyName = words[0];
+    chordOrScaleType = toCamelCase(words.slice(1));
+    
+  }
+
+  return { keyName, chordOrScaleType };
+}
 
 export default function FretboardSection({chordMode, activeScale, activeChord}:FretboardProps) {
     const containerRef = useRef<HTMLDivElement | null>(null);
-
-    // useEffect(() => {
-
-    //   if (containerRef.current && containerRef.current.children[0]) {
-    //     const canvas = containerRef.current.children[0] as HTMLCanvasElement;
-    //     const ctx = canvas.getContext('2d');
-    //     if (ctx) {
-    //       if (containerRef.current) {
-    //         const width = containerRef.current.offsetWidth;
-    //         const height = width / 4.3333;
-    //         const fretboardWidth = width * 0.85;
-    //         const fretboardHeight = height * 0.6;
-    //         const fretboardX = (width - fretboardWidth) / 2;
-    //         const fretboardY = (height - fretboardHeight) / 2;
-    //         const numFrets = NUMBER_OF_FRETS;
-    //         const numStrings = 6;
-    //         const stringSpacing = fretboardHeight / (numStrings - 1);
-    //         const fretWidth = fretboardWidth / numFrets;
-    //         const nutWidth = fretboardWidth * 0.02;
-
-    //         const fretboardParams = {
-    //             width,
-    //             height,
-    //             fretboardX,
-    //             fretboardY,
-    //             fretboardWidth,
-    //             fretboardHeight,
-    //             numFrets,
-    //             numStrings,
-    //             stringSpacing,
-    //             fretWidth,
-    //             nutWidth,
-    //         };
-
-    //         // if(chordMode) {
-    //         //   addNotesToNeck('D', intervalForScaleType['pentatonic'], ctx, fretboardParams);
-    //         // }
-    //         // else {
-    //         //   addNotesToNeck('E', intervalForScaleType['pentatonic'], ctx, fretboardParams);
-
-    //         // }
-    //       }
-      
-    //     }
-    //   }
-
-    // },[activeScale, activeChord]);
 
     const drawFretboard = (ctx: CanvasRenderingContext2D) => {
         if (containerRef.current) {
@@ -290,14 +271,9 @@ export default function FretboardSection({chordMode, activeScale, activeChord}:F
             };
 
             drawFretboardElements(ctx, fretboardParams);
-
-            // Example notes - draw c major scale
-            if (chordMode && activeChord) {
-              addNotesToNeck(activeChord.split(' ')[0], intervalForScaleType[activeChord.split(' ')[1]], ctx, fretboardParams);
-            }
-            else if(!chordMode && activeScale){
-              addNotesToNeck(activeScale.split(' ')[0], intervalForScaleType[activeScale.split(' ')[1]], ctx, fretboardParams);
-            }
+            const userInputValues: UserScaleOrChordInput = parseUserInput(chordMode? activeChord : activeScale);
+            const intervals = chordMode ? intervalsForChordType[userInputValues.chordOrScaleType]: intervalForScaleType[userInputValues.chordOrScaleType];
+            addNotesToNeck(userInputValues.keyName, intervals, ctx, fretboardParams);
     }
 };
 
@@ -309,3 +285,4 @@ return (
     </div>
 );
 }
+;
