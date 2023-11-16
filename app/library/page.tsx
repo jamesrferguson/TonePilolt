@@ -6,6 +6,7 @@ import ModeSelector from "@/components/library/ModeSelector";
 import LookUp  from "@/components/library/LookUp";
 import DetailsSection  from "@/components/library/DetailsSection";
 import FretboardSection  from "@/components/library/FretboardSection";
+import ChordScaleSelector from "@/components/library/ChordScaleSelector";
 
 
 export default function Library() {
@@ -37,6 +38,7 @@ export default function Library() {
             <LookUp chords={chords} scales={scales} chordMode={chordMode} setActiveScale={setActiveScale} setActiveChord={setActiveChord} />
             <DetailsSection useChordMode={chordMode}></DetailsSection>
             <FretboardSection chordMode={chordMode} activeScale={activeScale} activeChord={activeChord}/>
+            <ChordScaleSelector />
         </>
     )
 };
