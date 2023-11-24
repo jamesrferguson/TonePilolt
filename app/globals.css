@@ -144,6 +144,7 @@ button.active {
   --fret-color: #A9A9A9;
   --string-color: #000000;
   --marking-color: #2ecc71;
+  --key-active-bg-color: #100cf5;
 }
 
 body {
@@ -220,6 +221,10 @@ body {
   background-color: var(--key-hover-bg-color);
 }
 
+.circle-key.active {
+  background-color: var(--key-active-bg-color);
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -241,6 +246,10 @@ body {
 
 .grid-item:hover {
   background-color: var(--type-hover-bg-color);
+}
+
+.grid-item.active {
+  background-color: var(--key-active-bg-color);
 }
 
 /* Responsive adjustments */

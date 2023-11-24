@@ -1,33 +1,74 @@
+import { useState } from "react";
+
+const FLAT_SYMBOL = String.fromCharCode(9837);
+const CIRCLE_OF_FIFTHS = ["C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "E" + FLAT_SYMBOL, "B" + FLAT_SYMBOL, "F"];
+const SCALE_TYPES = ["Major", "Minor", "Pentatonic", "Harmonic Minor", "Melodic Minor", "Blues"];
+
+type KeyButtonProps = {
+    keyName: string;
+    onClick: (keyName: string) => void;
+    isActive: boolean;
+  };
+  
+  type ScaleTypeButtonProps = {
+    typeName: string;
+    onClick: (typeName: string) => void;
+    isActive: boolean;
+  };
+
+function KeyButton({ keyName, onClick, isActive }: KeyButtonProps) {
+  return (
+    <div className={`circle-key ${isActive ? 'active' : ''}`} onClick={() => onClick(keyName)}>
+      {keyName}
+    </div>
+  );
+}
+
+function ScaleTypeButton({ typeName, onClick, isActive }: ScaleTypeButtonProps) {
+  return (
+    <div className={`grid-item ${isActive ? 'active' : ''}`} onClick={() => onClick(typeName)}>
+      {typeName}
+    </div>
+  );
+}
+
 function ChordScaleSelector() {
+    const [currentKey, setCurrentKey] = useState("C");
+    const [currentScaleType, setCurrentScaleType] = useState("Major");
+
+    const handleKeyClick = (key: string): void => {
+        setCurrentKey(key);
+    };
+
+    const handleScaleTypeClick = (type: string): void => {
+        setCurrentScaleType(type);
+    };
+
     return (
         <div className="music-selector">
             <div className="circle-container">
                 <div className="circle-center-label">Keys</div>
-                {/* Cycle of fifths */}
-                <div className="circle-key" data-key="C">C</div>
-                <div className="circle-key" data-key="G">G</div>
-                <div className="circle-key" data-key="D">D</div>
-                <div className="circle-key" data-key="A">A</div>
-                <div className="circle-key" data-key="E">E</div>
-                <div className="circle-key" data-key="B">B</div>
-                <div className="circle-key" data-key="F#">F#</div>
-                <div className="circle-key" data-key="C#">C#</div>
-                <div className="circle-key" data-key="Ab">Ab</div>
-                <div className="circle-key" data-key="Eb">Eb</div>
-                <div className="circle-key" data-key="Bb">Bb</div>
-                <div className="circle-key" data-key="F">F</div>
+                {CIRCLE_OF_FIFTHS.map((key, index) => (
+                    <KeyButton
+                        key={index}
+                        keyName={key}
+                        onClick={handleKeyClick}
+                        isActive={currentKey === key}
+                    />
+                ))}
             </div>
             <div className="grid-container">
-                {/* Scale types */}
-                <div className="grid-item" data-type="major">Major</div>
-                <div className="grid-item" data-type="minor">Minor</div>
-                <div className="grid-item" data-type="pentatonic">Pentatonic</div>
-                <div className="grid-item" data-type="harmonicMinor">Harmonic Minor</div>
-                <div className="grid-item" data-type="melodicMinor">Melodic Minor</div>
-                <div className="grid-item" data-type="blues">Blues</div>
+                {SCALE_TYPES.map((type, index) => (
+                    <ScaleTypeButton
+                        key={index}
+                        typeName={type}
+                        onClick={handleScaleTypeClick}
+                        isActive={currentScaleType === type}
+                    />
+                ))}
             </div>
         </div>
-    )
+    );
 }
 
 export default ChordScaleSelector;
