@@ -1,25 +1,26 @@
 import { useState } from "react";
 
 const FLAT_SYMBOL = String.fromCharCode(9837);
-const CIRCLE_OF_FIFTHS = ["C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "E" + FLAT_SYMBOL, "B" + FLAT_SYMBOL, "F"];
+const CIRCLE_OF_FIFTHS = ["C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "Eb", "Bb", "F"];
 const SCALE_TYPES = ["Major", "Minor", "Pentatonic", "Harmonic Minor", "Melodic Minor", "Blues"];
 
 type KeyButtonProps = {
-    keyName: string;
-    onClick: (keyName: string) => void;
-    isActive: boolean;
-  };
+  dataKey: string;
+  label: string;
+  onSelect: (key: string) => void;
+  isActive: boolean;
+};
   
-  type ScaleTypeButtonProps = {
-    typeName: string;
-    onClick: (typeName: string) => void;
-    isActive: boolean;
-  };
+type ScaleTypeButtonProps = {
+  typeName: string;
+  onClick: (typeName: string) => void;
+  isActive: boolean;
+};
 
-function KeyButton({ keyName, onClick, isActive }: KeyButtonProps) {
+function KeyButton({ dataKey, label, onSelect, isActive }: KeyButtonProps) {
   return (
-    <div className={`circle-key ${isActive ? 'active' : ''}`} onClick={() => onClick(keyName)}>
-      {keyName}
+    <div className={`circle-key ${isActive ? 'active' : ''}`} data-key={dataKey} onClick={() => onSelect(dataKey)}>
+      {label}
     </div>
   );
 }
@@ -36,7 +37,7 @@ function ChordScaleSelector() {
     const [currentKey, setCurrentKey] = useState("C");
     const [currentScaleType, setCurrentScaleType] = useState("Major");
 
-    const handleKeyClick = (key: string): void => {
+    const handleKeySelect  = (key: string): void => {
         setCurrentKey(key);
     };
 
@@ -50,10 +51,11 @@ function ChordScaleSelector() {
                 <div className="circle-center-label">Keys</div>
                 {CIRCLE_OF_FIFTHS.map((key, index) => (
                     <KeyButton
-                        key={index}
-                        keyName={key}
-                        onClick={handleKeyClick}
-                        isActive={currentKey === key}
+                      key={key}
+                      dataKey={key}
+                      label={key}
+                      onSelect={handleKeySelect}
+                      isActive={currentKey === key}
                     />
                 ))}
             </div>
