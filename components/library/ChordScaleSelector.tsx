@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-const FLAT_SYMBOL = String.fromCharCode(9837);
 const CIRCLE_OF_FIFTHS = ["C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "Eb", "Bb", "F"];
 const SCALE_TYPES = ["Major", "Minor", "Pentatonic", "Harmonic Minor", "Melodic Minor", "Blues"];
 
