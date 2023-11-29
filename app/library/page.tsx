@@ -7,6 +7,7 @@ import LookUp  from "@/components/library/LookUp";
 import DetailsSection  from "@/components/library/DetailsSection";
 import FretboardSection  from "@/components/library/FretboardSection";
 import ChordScaleSelector from "@/components/library/ChordScaleSelector";
+import { ALL_NOTES, CHORD_TYPES, SCALE_TYPES } from "@/components/library/Constants";
 
 
 export default function Library() {
@@ -14,23 +15,13 @@ export default function Library() {
     let [activeScale, setActiveScale] = useState("");
     let [activeChord, setActiveChord] = useState("");
 
-    /TODO delete - for testing only/
-    //const chords = ["A", "Am", "B", "C", "D", "E", "Em"];
+    const scales = ALL_NOTES.flatMap(key => 
+      SCALE_TYPES.map(scaleType => `${key} ${scaleType}`)
+    );
 
-    // TODO remove duplication in here and in FretboardSection
-    const FLAT_SYMBOL = String.fromCharCode(9837);
-    const keys = [ 'A', 'B' + FLAT_SYMBOL, 'B', 'C', 'C#', 'D', 'E' + FLAT_SYMBOL, 'E', 'F', 'F#', 'G', 'G#' ];
-
-    const scaleTypes = ['major', 'minor', 'pentatonic', 'harmonic minor'];
-    const chordTypes = ['major', 'minor'];
-
-    const scales = keys.flatMap(key => 
-        scaleTypes.map(scaleType => `${key} ${scaleType}`)
-      );
-
-    const chords = keys.flatMap(key => 
-        chordTypes.map(chordType => `${key} ${chordType}`)
-      );
+    const chords = ALL_NOTES.flatMap(key => 
+      CHORD_TYPES.map(chordType => `${key} ${chordType}`)
+    );
 
     return (
         <>

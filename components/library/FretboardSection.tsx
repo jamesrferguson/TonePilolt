@@ -1,11 +1,7 @@
 import React, { useRef, useEffect, useCallback  } from 'react';
+import { ALL_NOTES, MAP_STRINGS_TO_STRINGNUMBER, NUMBER_OF_FRETS,
+   STRING_NOTES, STRING_LABELS, intervalsForChordType, intervalForScaleType } from "@/components/library/Constants";
 
-interface Note {
-    string: number;
-    fret: number;
-    label: string;
-}
-  
 interface FretboardParams {
     width: number;
     height: number;
@@ -19,22 +15,6 @@ interface FretboardParams {
     fretWidth: number;
     nutWidth: number;
 }
-
-const NUMBER_OF_FRETS = 22;
-const FLAT_SYMBOL = String.fromCharCode(9837);
-const STRING_NOTES = [ 'E_HIGH', 'B', 'G', 'D', 'A', 'E_LOW' ];
-const STRING_LABELS = [ 'E', 'B', 'G', 'D', 'A', 'E' ];
-const ALL_NOTES = [ 'A', 'B' + FLAT_SYMBOL, 'B', 'C', 'C#', 'D', 'E' + FLAT_SYMBOL, 'E', 'F', 'F#', 'G', 'G#' ];
-const MAP_STRINGS_TO_STRINGNUMBER: {[index: string]: number} = {
-        E_HIGH: 6, B: 5, G: 4, D: 3, A: 2, E_LOW: 1
-};
-const intervalForScaleType: {[index: string]: string} = {
-    major: '0,2,4,5,7,9,11', minor: '0,2,3,5,7,8,10', pentatonic: '0,3,5,7,10',
-    harmonicMinor: '0,2,3,5,7,8,11'
-};
-const intervalsForChordType: {[index: string]: string} = {
-  major: '0,4,7', minor: '0,3,7'
-};
 
 const orderNotesForStartingNote = (startingNote: string) => {
     if (startingNote == 'E_LOW' || startingNote == 'E_HIGH') { // TODO: move this check
@@ -275,14 +255,13 @@ export default function FretboardSection({chordMode, activeScale, activeChord}:F
             const intervals = chordMode ? intervalsForChordType[userInputValues.chordOrScaleType]: intervalForScaleType[userInputValues.chordOrScaleType];
             addNotesToNeck(userInputValues.keyName, intervals, ctx, fretboardParams);
     }
-};
+    };
 
-useCanvasResize(drawFretboard, containerRef);
+    useCanvasResize(drawFretboard, containerRef);
 
-return (
-    <div className="fretboard-section" ref={containerRef}>
-    <canvas style={{ width: '100%', height: 'auto' }} />
-    </div>
-);
-}
-;
+    return (
+        <div className="fretboard-section" ref={containerRef}>
+        <canvas style={{ width: '100%', height: 'auto' }} />
+        </div>
+    );
+  };

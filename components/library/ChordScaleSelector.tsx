@@ -1,7 +1,5 @@
 import { useState } from "react";
-
-const CIRCLE_OF_FIFTHS = ["C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "Eb", "Bb", "F"];
-const SCALE_TYPES = ["Major", "Minor", "Pentatonic", "Harmonic Minor", "Melodic Minor", "Blues"];
+import { CIRCLE_OF_FIFTHS, SCALE_TYPES } from "@/components/library/Constants";
 
 type KeyButtonProps = {
   dataKey: string;
