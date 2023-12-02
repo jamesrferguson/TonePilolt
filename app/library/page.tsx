@@ -27,7 +27,7 @@ export default function Library() {
         <>
             <ModeSelector chordMode={chordMode} setChordMode={setChordMode} />
             <LookUp chords={chords} scales={scales} chordMode={chordMode} setActiveScale={setActiveScale} setActiveChord={setActiveChord} />
-            <ChordScaleSelector />
+            <ChordScaleSelector chords={chords} scales={scales} chordMode={chordMode} setActiveScale={setActiveScale} setActiveChord={setActiveChord} />
             <DetailsSection useChordMode={chordMode}></DetailsSection>
             <FretboardSection chordMode={chordMode} activeScale={activeScale} activeChord={activeChord}/>
         </>
