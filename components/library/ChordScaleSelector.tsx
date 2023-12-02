@@ -37,32 +37,33 @@ type ChordScaleSelectorProps = {
 }
 
 function ChordScaleSelector({chordMode, setActiveChord, setActiveScale}: ChordScaleSelectorProps) {
-    const [currentKey, setCurrentKey] = useState("C");
-    const [currentScaleType, setCurrentScaleType] = useState("Major");
-    const [currentChordType, setCurrentChordType] = useState("Major");
+    const [currentKey, setCurrentKey] = useState("");
+    const [currentScaleType, setCurrentScaleType] = useState("");
+    const [currentChordType, setCurrentChordType] = useState("");
 
-    const updateCurrentScaleOrChord = useCallback(() => {
-      const value = currentKey + " " + (chordMode ? currentChordType : currentScaleType);
-      if (chordMode) {
-        setActiveChord(value);
-      } else {
-        setActiveScale(value);
-      }
-    }, [currentKey, currentScaleType, currentChordType, chordMode, setActiveChord, setActiveScale]);
-  
-    const handleKeySelect = useCallback((key: string) => {
+    const handleKeySelect = useCallback((key: string): void => {
       setCurrentKey(key);
-      updateCurrentScaleOrChord();
-    }, [updateCurrentScaleOrChord]);
-  
-    const handleScaleTypeClick = useCallback((type: string) => {
+      setCurrentScaleType(currentScale => {
+        const newValue = key + " " + currentScale;
+        if (chordMode) {
+          setActiveChord(newValue);
+        } else {
+          setActiveScale(newValue);
+        }
+        return currentScale; 
+      });
+    }, [chordMode, setActiveChord, setActiveScale]);
+    
+    const handleChordOrScaleTypeClick = useCallback((type: string): void => {
+      const activeValue = currentKey + " " + type;
       if (chordMode) {
         setCurrentChordType(type);
+        setActiveChord(activeValue);
       } else {
         setCurrentScaleType(type);
+        setActiveScale(activeValue);
       }
-      updateCurrentScaleOrChord();
-    }, [chordMode, updateCurrentScaleOrChord]);
+    }, [chordMode, currentKey, setActiveChord, setActiveScale]);
 
     return (
         <div className="music-selector">
@@ -83,7 +84,7 @@ function ChordScaleSelector({chordMode, setActiveChord, setActiveScale}: ChordSc
                 <ScaleTypeButton
                   key={index}
                   typeName={type}
-                  onClick={() => handleScaleTypeClick(type)}
+                  onClick={() => handleChordOrScaleTypeClick(type)}
                   isActive={(chordMode ? currentChordType : currentScaleType) === type}
                 />
               ))}
