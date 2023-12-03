@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { CIRCLE_OF_FIFTHS, SCALE_TYPES, CHORD_TYPES } from "@/components/library/Constants";
 
 type KeyButtonProps = {
@@ -32,14 +32,28 @@ function ScaleTypeButton({ typeName, onClick, isActive }: ScaleTypeButtonProps) 
 
 type ChordScaleSelectorProps = {
   chordMode: boolean;
+  activeScale: string;
+  activeChord: string;
   setActiveScale: React.Dispatch<React.SetStateAction<string>>;
   setActiveChord: React.Dispatch<React.SetStateAction<string>>;
 }
 
-function ChordScaleSelector({chordMode, setActiveChord, setActiveScale}: ChordScaleSelectorProps) {
-    const [currentKey, setCurrentKey] = useState("");
-    const [currentScaleType, setCurrentScaleType] = useState("");
-    const [currentChordType, setCurrentChordType] = useState("");
+function ChordScaleSelector({chordMode, activeScale, activeChord, setActiveChord, setActiveScale}: ChordScaleSelectorProps) {
+    const [currentKey, setCurrentKey] = useState(chordMode ? activeChord.split(' ')[0] : activeScale.split(' ')[0]);
+    const [currentScaleType, setCurrentScaleType] = useState(chordMode ? '' : activeScale.split(' ')[1]);
+    const [currentChordType, setCurrentChordType] = useState(chordMode ? activeChord.split(' ')[1] : '');
+
+    useEffect(() => {
+        if (chordMode) {
+            const [key, type] = activeChord.split(' ');
+            setCurrentKey(key);
+            setCurrentChordType(type);
+        } else {
+            const [key, type] = activeScale.split(' ');
+            setCurrentKey(key);
+            setCurrentScaleType(type);
+        }
+    }, [activeScale, activeChord, chordMode]);
 
     const handleKeySelect = useCallback((key: string): void => {
       setCurrentKey(key);
