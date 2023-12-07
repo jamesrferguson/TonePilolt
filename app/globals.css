@@ -69,7 +69,16 @@ button.active {
   color: white;
 }
 
-.fretboard-section, .chord-diagram, .scale-diagram, {
+.fretboard-section canvas {
+  width: 100%;
+  min-width: 1000px;
+}
+
+.fretboard-section {
+  overflow-x: auto;
+}
+
+.fretboard-section, .chord-diagram, .scale-diagram {
   margin-bottom: 20px;
   padding: 20px;
   background-color: #fff;
@@ -269,7 +278,7 @@ body {
      /* Define two columns, each taking up half of the grid container width */
      grid-template-columns: repeat(2, 1fr);
      gap: 10px; /* Adjust the gap between grid items as needed */
-     width: 100%; /* Set the width of the grid container to fill its parent */
+     width: auto;
      box-sizing: border-box; /* Include padding and border in the element's total width and height */
   }
 

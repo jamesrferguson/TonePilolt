@@ -163,28 +163,31 @@ const drawNote = (
 };
 
 const useCanvasResize = (drawFretboard: (ctx: CanvasRenderingContext2D) => void, containerRef: React.RefObject<HTMLDivElement>) => {
-    const resizeCanvas = useCallback(() => {
-      if (containerRef.current && containerRef.current.children[0]) {
-        const canvas = containerRef.current.children[0] as HTMLCanvasElement;
-        const width = containerRef.current.offsetWidth;
-        const height = width / 4.3333;
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          drawFretboard(ctx);
-        }
+  const resizeCanvas = useCallback(() => {
+    if (containerRef.current && containerRef.current.children[0]) {
+      const canvas = containerRef.current.children[0] as HTMLCanvasElement;
+      const rect = canvas.getBoundingClientRect();
+      const width = rect.width;
+      const height = width / 4.3333;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.scale(dpr, dpr);
+        drawFretboard(ctx);
       }
-    }, [containerRef, drawFretboard]);
-  
-    useEffect(() => {
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-      return () => {
-        window.removeEventListener('resize', resizeCanvas);
-      };
-    }, [resizeCanvas]);
-  }
+    }
+  }, [containerRef, drawFretboard]);
+
+  useEffect(() => {
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [resizeCanvas]);
+}
 
 type FretboardProps = {
   chordMode: boolean;
@@ -223,45 +226,46 @@ export default function FretboardSection({chordMode, activeScale, activeChord}:F
     const containerRef = useRef<HTMLDivElement | null>(null);
 
     const drawFretboard = (ctx: CanvasRenderingContext2D) => {
-        if (containerRef.current) {
-            const width = containerRef.current.offsetWidth;
-            const height = width / 4.3333;
-            const fretboardWidth = width * 0.85;
-            const fretboardHeight = height * 0.6;
-            const fretboardX = (width - fretboardWidth) / 2;
-            const fretboardY = (height - fretboardHeight) / 2;
-            const numFrets = NUMBER_OF_FRETS;
-            const numStrings = 6;
-            const stringSpacing = fretboardHeight / (numStrings - 1);
-            const fretWidth = fretboardWidth / numFrets;
-            const nutWidth = fretboardWidth * 0.02;
-
-            const fretboardParams = {
-                width,
-                height,
-                fretboardX,
-                fretboardY,
-                fretboardWidth,
-                fretboardHeight,
-                numFrets,
-                numStrings,
-                stringSpacing,
-                fretWidth,
-                nutWidth,
-            };
-
-            drawFretboardElements(ctx, fretboardParams);
-            const userInputValues: UserScaleOrChordInput = parseUserInput(chordMode? activeChord : activeScale);
-            const intervals = chordMode ? intervalsForChordType[userInputValues.chordOrScaleType]: intervalForScaleType[userInputValues.chordOrScaleType];
-            addNotesToNeck(userInputValues.keyName, intervals, ctx, fretboardParams);
-    }
+      if (containerRef.current && containerRef.current.children[0]) {
+        const canvas = containerRef.current.children[0] as HTMLCanvasElement;
+        const width = canvas.width;
+        const height = width / 4.3333;
+        const fretboardWidth = width * 0.85;
+        const fretboardHeight = height * 0.6;
+        const fretboardX = (width - fretboardWidth) / 2;
+        const fretboardY = (height - fretboardHeight) / 2;
+        const numFrets = NUMBER_OF_FRETS;
+        const numStrings = 6;
+        const stringSpacing = fretboardHeight / (numStrings - 1);
+        const fretWidth = fretboardWidth / numFrets;
+        const nutWidth = fretboardWidth * 0.02;
+    
+        const fretboardParams = {
+          width,
+          height,
+          fretboardX,
+          fretboardY,
+          fretboardWidth,
+          fretboardHeight,
+          numFrets,
+          numStrings,
+          stringSpacing,
+          fretWidth,
+          nutWidth,
+        };
+    
+        drawFretboardElements(ctx, fretboardParams);
+        const userInputValues: UserScaleOrChordInput = parseUserInput(chordMode? activeChord : activeScale);
+        const intervals = chordMode ? intervalsForChordType[userInputValues.chordOrScaleType]: intervalForScaleType[userInputValues.chordOrScaleType];
+        addNotesToNeck(userInputValues.keyName, intervals, ctx, fretboardParams);
+      }
     };
 
     useCanvasResize(drawFretboard, containerRef);
 
     return (
-        <div className="fretboard-section" ref={containerRef}>
+      <div className="fretboard-section" ref={containerRef}>
         <canvas style={{ width: '100%', height: 'auto' }} />
-        </div>
+      </div>
     );
   };
