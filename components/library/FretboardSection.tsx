@@ -50,13 +50,13 @@ const notesFromScaleInterval = (keyName: string, intervals: string) => {
   return [];
 }
 
-const addNotesToNeck = (selectedKey: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: FretboardParams) => {
+export const addNotesToNeck = (selectedKey: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: FretboardParams) => {
     for (let i = 0; i < STRING_NOTES.length; i++){
       drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(selectedKey, scaleInterval), selectedKey, fretboardParams);
     }
 }
 
-const drawFretboardElements = (
+export const drawFretboardElements = (
   ctx: CanvasRenderingContext2D,
   fretboardParams: FretboardParams
 ) => {
@@ -208,7 +208,7 @@ interface UserScaleOrChordInput {
   chordOrScaleType: string;
 }
 
-function parseUserInput(input: string | undefined): UserScaleOrChordInput {
+export function parseUserInput(input: string | undefined): UserScaleOrChordInput {
   let keyName = "";
   let chordOrScaleType = "";
 
