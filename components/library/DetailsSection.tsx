@@ -18,31 +18,65 @@ const calculateNote = (keyName: string, intervals: number[], string: number, fre
 
 
 
-const drawVerticalFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any) => {
-  const { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
+// const drawVerticalFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any) => {
+//   const { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
 
-  // Fill fretboard area with the same color as in FretboardSection
-  ctx.fillStyle = '#8B4513'; // replace 'desired color' with the color used in FretboardSection
-  ctx.fillRect(fretboardX, fretboardY, numStrings * stringSpacing, numFrets * fretWidth);
+//   // Fill fretboard area with the same color as in FretboardSection
+//   ctx.fillStyle = '#8B4513'; // replace 'desired color' with the color used in FretboardSection
+//   ctx.fillRect(fretboardX, fretboardY, numStrings * stringSpacing, numFrets * fretWidth);
 
-  // Draw strings
-  for (let string = 0; string < numStrings; string++) {
-    const x = fretboardX + string * stringSpacing;
-    ctx.beginPath();
-    ctx.moveTo(x, fretboardY);
-    ctx.lineTo(x, fretboardY + numFrets * fretWidth);
-    ctx.stroke();
-  }
+//   // Draw strings
+//   for (let string = 0; string < numStrings; string++) {
+//     const x = fretboardX + string * stringSpacing;
+//     ctx.beginPath();
+//     ctx.moveTo(x, fretboardY);
+//     ctx.lineTo(x, fretboardY + numFrets * fretWidth);
+//     ctx.stroke();
+//   }
 
-  // Draw frets
-  for (let fret = 0; fret <= numFrets; fret++) {
-    const y = fretboardY + fret * fretWidth;
-    ctx.beginPath();
-    ctx.moveTo(fretboardX, y);
-    ctx.lineTo(fretboardX + (numStrings - 1) * stringSpacing, y);
-    ctx.stroke();
-  }
-}
+//   // Draw frets
+//   for (let fret = 0; fret <= numFrets; fret++) {
+//     const y = fretboardY + fret * fretWidth;
+//     ctx.beginPath();
+//     ctx.moveTo(fretboardX, y);
+//     ctx.lineTo(fretboardX + (numStrings - 1) * stringSpacing, y);
+//     ctx.stroke();
+//   }
+// }
+
+    const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any) => { 
+        const { width, height, fretboardX, fretboardY, fretboardWidth, fretboardHeight, numFrets, numStrings, stringSpacing, fretWidth, nutWidth } = fretboardParams;
+
+        // Define the color of the fretboard
+        const fretboardColor = '#8B4513'; // SaddleBrown
+
+        // Define the color of the frets and strings
+        const fretColor = '#A9A9A9'; // DarkGray
+        const stringColor = '#000000'; // Black
+
+        // Define the color of the fret markings
+        const fretMarkingColor = 'green';
+
+        //Draw fretboard
+        ctx.fillStyle = fretboardColor;
+        ctx.fillRect(fretboardX, fretboardY, fretboardWidth, fretboardHeight);
+
+        // Draw frets
+        for (let i = 1; i < numFrets; i++) {
+            ctx.fillStyle = fretColor;
+            ctx.fillRect(fretboardX, fretboardY + i * fretWidth, fretboardWidth, 2);
+        }
+
+        // Draw strings
+        for (let i = 0; i < numStrings; i++) {
+            ctx.fillStyle = stringColor;
+            ctx.fillRect(fretboardX + i * stringSpacing, fretboardY, 2, fretboardHeight);
+        }
+
+
+
+
+    }
   
   const addNotesToChordDiagram = (keyName: string, intervals: number[], ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0) => {
     const { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
@@ -101,13 +135,44 @@ const drawVerticalFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: a
             canvas.height = canvas.offsetHeight * dpr;
             ctx.scale(dpr, dpr);
   
+            // const width = canvas.width;
+            // const height = width / 4.3333;
+            // const fretWidth = (width - 2 * fretboardX) / numFrets;
+            // const stringSpacing = (height - 2 * fretboardY) / (numStrings - 1);
+
+
             const width = canvas.width;
-            const height = width / 4.3333;
-            const fretWidth = (width - 2 * fretboardX) / numFrets;
-            const stringSpacing = (height - 2 * fretboardY) / (numStrings - 1);
-            const fretboardParams = { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing };
+            const height = canvas.height;
+            const fretboardWidth = width * 0.85;
+            const fretboardHeight = height;
+            const fretboardX = (width - fretboardWidth) / 2;
+            const fretboardY = (height - fretboardHeight) / 2;
+            const numFrets = 5;
+            const numStrings = 6;
+            const stringSpacing = fretboardWidth / (numStrings - 1);
+            const fretWidth = fretboardHeight / numFrets;
+            const nutWidth = fretboardWidth * 0.02;
+
+            const fretboardParams = {
+                width,
+                height,
+                fretboardX,
+                fretboardY,
+                fretboardWidth,
+                fretboardHeight,
+                numFrets,
+                numStrings,
+                stringSpacing,
+                fretWidth,
+                nutWidth
+              };
+
+
+
+
+            // const fretboardParams = { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing };
   
-            drawVerticalFretboard(ctx, fretboardParams);
+            drawFretboard(ctx, fretboardParams);
   
             const userInputValues = parseUserInput(activeChord);
             // const intervalsString = intervalsForChordType[userInputValues.chordOrScaleType];
@@ -117,7 +182,6 @@ const drawVerticalFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: a
               intervals = intervalsString.split(',').map(Number);
             }
             // addNotesToChordDiagram(userInputValues.keyName, intervals, ctx, fretboardParams);
-            addNotesToChordDiagram('C', intervals, ctx, fretboardParams);
 
             console.log('Key name:', userInputValues.keyName);
             console.log('Intervals:', intervals);

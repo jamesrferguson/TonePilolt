@@ -75,6 +75,10 @@ button.active {
   justify-content: space-between;
 }
 
+.details-section canvas {
+  margin: 5px;
+}
+
 .fretboard-section canvas {
   width: 100%;
   min-width: 1000px;
