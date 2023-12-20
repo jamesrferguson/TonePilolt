@@ -44,7 +44,7 @@ const calculateNote = (keyName: string, intervals: number[], string: number, fre
 //   }
 // }
 
-    const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any) => { 
+    const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, startingFret: number) => { 
         const { width, height, fretboardX, fretboardY, fretboardWidth, fretboardHeight, numFrets, numStrings, stringSpacing, fretWidth, nutWidth } = fretboardParams;
 
         // Define the color of the fretboard
@@ -73,8 +73,12 @@ const calculateNote = (keyName: string, intervals: number[], string: number, fre
             ctx.fillRect(fretboardX + i * stringSpacing, fretboardY, 2, fretboardHeight);
         }
 
-
-
+        // Draw fret numbers
+        ctx.fillStyle = '#000000'; // Black
+        ctx.font = '12px Arial'; // Adjust as needed
+        for (let i = 0; i < numFrets; i++) {
+            ctx.fillText((startingFret + i).toString(), fretboardX - 15, fretboardY + i * fretWidth + fretWidth / 2);
+        }
 
     }
   
@@ -113,10 +117,7 @@ const calculateNote = (keyName: string, intervals: number[], string: number, fre
         containerRef.current.innerHTML = '';
 
         const dpr = window.devicePixelRatio || 1;
-        const numFrets = 3;
-        const numStrings = 6;
-        const fretboardX = 90;
-        const fretboardY = 10;
+        let startingFret = 1;
   
         Array.from({ length: 5 }).forEach((_, index) => {
           const canvas = document.createElement('canvas');
@@ -135,12 +136,6 @@ const calculateNote = (keyName: string, intervals: number[], string: number, fre
             canvas.height = canvas.offsetHeight * dpr;
             ctx.scale(dpr, dpr);
   
-            // const width = canvas.width;
-            // const height = width / 4.3333;
-            // const fretWidth = (width - 2 * fretboardX) / numFrets;
-            // const stringSpacing = (height - 2 * fretboardY) / (numStrings - 1);
-
-
             const width = canvas.width;
             const height = canvas.height;
             const fretboardWidth = width * 0.85;
@@ -168,11 +163,7 @@ const calculateNote = (keyName: string, intervals: number[], string: number, fre
               };
 
 
-
-
-            // const fretboardParams = { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing };
-  
-            drawFretboard(ctx, fretboardParams);
+            drawFretboard(ctx, fretboardParams, startingFret);
   
             const userInputValues = parseUserInput(activeChord);
             // const intervalsString = intervalsForChordType[userInputValues.chordOrScaleType];
@@ -185,6 +176,8 @@ const calculateNote = (keyName: string, intervals: number[], string: number, fre
 
             console.log('Key name:', userInputValues.keyName);
             console.log('Intervals:', intervals);
+
+            startingFret += 5;
           }
 
           
