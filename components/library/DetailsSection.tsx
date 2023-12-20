@@ -62,9 +62,29 @@ const calculateNote = (keyName: string, intervals: number[], string: number, fre
         ctx.fillRect(fretboardX, fretboardY, fretboardWidth, fretboardHeight);
 
         // Draw frets
-        for (let i = 1; i < numFrets; i++) {
+        const fretMarkings = [3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
+        const fretMarkingRadius = width * 0.007;
+        for (let i = 0; i < numFrets; i++) {
             ctx.fillStyle = fretColor;
             ctx.fillRect(fretboardX, fretboardY + i * fretWidth, fretboardWidth, 2);
+            if (fretMarkings.includes(i + startingFret)) {
+                if (i + startingFret === 12 || i + startingFret === 24) {
+                    const markingY = fretboardY + i * fretWidth + fretWidth / 2;
+                    ctx.beginPath();
+                    ctx.arc(fretboardX - 30 + fretboardWidth / 2, markingY, fretMarkingRadius, 0, 2 * Math.PI);
+                    ctx.arc(fretboardX + 30 + fretboardWidth / 2, markingY, fretMarkingRadius, 0, 2 * Math.PI);
+                    ctx.fillStyle = fretMarkingColor;
+                    ctx.fill();
+                    ctx.closePath();
+                } else {
+                    const markingY = fretboardY + i * fretWidth + fretWidth / 2;
+                    ctx.beginPath();
+                    ctx.arc(fretboardX + fretboardWidth / 2, markingY, fretMarkingRadius, 0, 2 * Math.PI);
+                    ctx.fillStyle = fretMarkingColor;
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
         }
 
         // Draw strings
@@ -72,6 +92,29 @@ const calculateNote = (keyName: string, intervals: number[], string: number, fre
             ctx.fillStyle = stringColor;
             ctx.fillRect(fretboardX + i * stringSpacing, fretboardY, 2, fretboardHeight);
         }
+
+        // Draw fret markings
+        // const fretMarkings = [3, 5, 7, 9, 12, 15, 17, 19, 21];
+        // const fretMarkingRadius = width * 0.007;
+        // fretMarkings.forEach(fret => {
+        //     const markingY = fretboardY + fretboardHeight / 2;
+        //     const markingX = fretboardX + fret * fretWidth - fretWidth / 2;
+        //     if (fret === 12) {
+        //     ctx.beginPath();
+        //     ctx.arc(markingX, markingY - fretMarkingRadius * 4, fretMarkingRadius, 0, 2 * Math.PI);
+        //     ctx.arc(markingX, markingY + fretMarkingRadius * 4, fretMarkingRadius, 0, 2 * Math.PI);
+        //     ctx.fillStyle = fretMarkingColor;
+        //     ctx.fill();
+        //     ctx.closePath();
+        //     } else {
+        //     ctx.beginPath();
+        //     ctx.arc(markingX, markingY, fretMarkingRadius, 0, 2 * Math.PI);
+        //     ctx.fillStyle = fretMarkingColor;
+        //     ctx.fill();
+        //     ctx.closePath();
+        //     }
+        // });
+
 
         // Draw fret numbers
         ctx.fillStyle = '#000000'; // Black
