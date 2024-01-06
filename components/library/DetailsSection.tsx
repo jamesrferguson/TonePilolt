@@ -7,7 +7,7 @@ interface DetailsSectionProps {
   activeChord: string;
 }
 
-const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, startingFret: number, maxFret: number)  => { 
+const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, startingFret: number, maxFret: number, oneNotePerStringOnly: boolean)  => { 
     let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName] - 1;
     let notesForString = orderNotesForStartingNote(stringName);
 
@@ -15,6 +15,9 @@ const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, n
         let j = i % 12;
         if (notes.indexOf(notesForString[j]) > -1){
             drawNote(ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret);
+            if (oneNotePerStringOnly) {
+                break;
+            }
         }
     }
 };
@@ -44,9 +47,9 @@ const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumbe
     ctx.fillText(noteName, x - fretWidth / 8, y + fretWidth / 8);
 };
 
-const addNotesToNeck = (keyName: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0, maxFret: number) => { 
+const addNotesToNeck = (keyName: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0, maxFret: number, oneNotePerStringOnly: boolean) => { 
     for (let i = 0; i < STRING_NOTES.length; i++){
-        drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(keyName, scaleInterval), keyName, fretboardParams, startFret, maxFret);
+        drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(keyName, scaleInterval), keyName, fretboardParams, startFret, maxFret, oneNotePerStringOnly);
     }
 };
 
@@ -132,10 +135,10 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
     }
 }
   
-const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0, maxFret: number) => {
+const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0, maxFret: number, oneNotePerStringOnly: boolean) => {
     const { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
         for (let string = 0; string < numStrings; string++) {
-            addNotesToNeck('C', intervals, ctx, fretboardParams, startFret, maxFret);
+            addNotesToNeck('C', intervals, ctx, fretboardParams, startFret, maxFret, oneNotePerStringOnly);
         }
     };
 
@@ -202,7 +205,12 @@ const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasR
                 // const intervalsString = intervalsForChordType[userInputValues.chordOrScaleType];
                 const intervalsString = intervalsForChordType['major'];
                 console.log('calling add notes to chord diagram')
-                addNotesToChordDiagram('C', intervalsString, ctx, fretboardParams, startingFret, maxFret);
+
+                // TODO this should be set for chord mode so that we only draw one note per string.
+                // For scale mode we want this to be false.
+                let oneNotePerStringOnly = true;
+
+                addNotesToChordDiagram('C', intervalsString, ctx, fretboardParams, startingFret, maxFret, oneNotePerStringOnly);
 
                 startingFret += 5;
             }
