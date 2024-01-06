@@ -8,8 +8,12 @@ interface DetailsSectionProps {
 }
 
 const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, startingFret: number)  => { 
-    let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName];
+    let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName] - 1;
     let notesForString = orderNotesForStartingNote(stringName);
+
+    console.log('stringNumber', stringNumber);
+    console.log('stringName', stringName);
+    console.log('notesForString', notesForString);
 
     for (let i = startingFret; i <= fretboardParams.numFrets; i++) {
         let j = i % 12;
@@ -134,8 +138,6 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
   
 const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0) => {
     const { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
-        console.log('adding notes to chord diagram')
-        console.log(`startFret: ${startFret}`)
         for (let string = 0; string < numStrings; string++) {
             addNotesToNeck('C', intervals, ctx, fretboardParams, startFret);
         }
