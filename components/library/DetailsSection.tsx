@@ -2,30 +2,14 @@
 import React, { useEffect, useRef } from 'react';
 import { parseUserInput, notesFromScaleInterval, orderNotesForStartingNote } from './FretboardSection';
 import { intervalsForChordType, MAP_STRINGS_TO_STRINGNUMBER, STRING_NOTES  } from './Constants';
-import { start } from 'repl';
 
 interface DetailsSectionProps {
   activeChord: string;
 }
 
-// const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
-// const calculateNote = (keyName: string, intervals: number[], string: number, fret: number) => {
-//   const keyIndex = notes.indexOf(keyName);
-//   const interval = intervals[string];
-//   const noteIndex = (keyIndex + interval + fret) % notes.length;
-//   return notes[noteIndex];
-// };
-
 const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, startingFret: number)  => { 
     let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName];
     let notesForString = orderNotesForStartingNote(stringName);
-
-    console.log("calling drawNotesForString")
-    console.log(`stringName: ${stringName}`)
-    console.log(`notes: ${notes}`)
-    console.log(`rootNote: ${rootNote}`)
-    console.log(`notesForString: ${notesForString}`)
 
     for (let i = startingFret; i <= fretboardParams.numFrets; i++) {
         let j = i % 12;
@@ -40,7 +24,7 @@ const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumbe
     const x = fretboardX + stringNumber * stringSpacing;
     let y;
     if (fretNumber === 0) {
-        y = fretboardY - fretWidth / 16;
+        y = fretboardY + fretWidth / 2;
     } else {
         y = fretboardY + (fretNumber - startingFret) * fretWidth + fretWidth / 2;
 
@@ -83,7 +67,7 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
     const nutColor = '#A9A9A9'; // White
     const nutHeight = 0.25 * fretWidth; // adjust this value as needed
 
-    const fretNumCount = 5;
+    const fretNumCount = numFrets;;
 
     if (startingFret === 0) {
         numFrets -= 1;
