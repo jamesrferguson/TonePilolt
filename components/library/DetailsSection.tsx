@@ -7,15 +7,11 @@ interface DetailsSectionProps {
   activeChord: string;
 }
 
-const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, startingFret: number)  => { 
+const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, startingFret: number, maxFret: number)  => { 
     let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName] - 1;
     let notesForString = orderNotesForStartingNote(stringName);
 
-    console.log('stringNumber', stringNumber);
-    console.log('stringName', stringName);
-    console.log('notesForString', notesForString);
-
-    for (let i = startingFret; i <= fretboardParams.numFrets; i++) {
+    for (let i = startingFret; i <= Math.max(startingFret + fretboardParams.numFrets, maxFret); i++) {
         let j = i % 12;
         if (notes.indexOf(notesForString[j]) > -1){
             drawNote(ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret);
@@ -48,9 +44,9 @@ const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumbe
     ctx.fillText(noteName, x - fretWidth / 8, y + fretWidth / 8);
 };
 
-const addNotesToNeck = (keyName: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0) => { 
+const addNotesToNeck = (keyName: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0, maxFret: number) => { 
     for (let i = 0; i < STRING_NOTES.length; i++){
-        drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(keyName, scaleInterval), keyName, fretboardParams, startFret);
+        drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(keyName, scaleInterval), keyName, fretboardParams, startFret, maxFret);
     }
 };
 
@@ -136,10 +132,10 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
     }
 }
   
-const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0) => {
+const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0, maxFret: number) => {
     const { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
         for (let string = 0; string < numStrings; string++) {
-            addNotesToNeck('C', intervals, ctx, fretboardParams, startFret);
+            addNotesToNeck('C', intervals, ctx, fretboardParams, startFret, maxFret);
         }
     };
 
@@ -206,7 +202,7 @@ const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasR
                 // const intervalsString = intervalsForChordType[userInputValues.chordOrScaleType];
                 const intervalsString = intervalsForChordType['major'];
                 console.log('calling add notes to chord diagram')
-                addNotesToChordDiagram('C', intervalsString, ctx, fretboardParams, startingFret);
+                addNotesToChordDiagram('C', intervalsString, ctx, fretboardParams, startingFret, maxFret);
 
                 startingFret += 5;
             }
