@@ -7,20 +7,72 @@ interface DetailsSectionProps {
   activeChord: string;
 }
 
-const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, startingFret: number, maxFret: number, oneNotePerStringOnly: boolean)  => { 
-    let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName] - 1;
-    let notesForString = orderNotesForStartingNote(stringName);
+const isRootNote = (note: string, rootNote: string) => {
+    return note === rootNote;
+}
 
-    for (let i = startingFret; i <= Math.max(startingFret + fretboardParams.numFrets, maxFret); i++) {
-        let j = i % 12;
-        if (notes.indexOf(notesForString[j]) > -1){
-            drawNote(ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret);
-            if (oneNotePerStringOnly) {
-                break;
-            }
+const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, cagedPosition:string, startingFret: number, maxFret: number, oneNotePerStringOnly: boolean, drawFromRootNoteOnly: boolean ) => { 
+  let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName] - 1;
+  let notesForString = orderNotesForStartingNote(stringName);
+  let drawNotesParamsList: [CanvasRenderingContext2D, number, number, string, boolean, any, number][] = [];
+
+  let rootNoteFound = false;
+  for (let i = startingFret; i <= startingFret + fretboardParams.numFrets - 1; i++) {
+    let j = i % 12;
+    if (notes.indexOf(notesForString[j]) > -1){
+      if (drawFromRootNoteOnly && !rootNoteFound) {
+        if (isRootNote(notesForString[j], rootNote)) {
+          rootNoteFound = true;
+        }
+      } 
+      if ((cagedPosition === 'G' || cagedPosition === 'E') && stringName === 'E_LOW') {
+        if (rootNoteFound) {
+            drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
+            break;
+        }
+      }
+
+      if ((cagedPosition === 'C' || cagedPosition === 'A') && stringName === 'E_LOW') {
+        break;
+      }
+
+      if ((cagedPosition === 'C' || cagedPosition === 'A') && stringName === 'A') {
+        if (rootNoteFound) {
+            drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
+            break;
+        }
+      }
+
+      if (cagedPosition === 'D' && (stringName === 'E_LOW' || stringName === 'A')) {
+        break;
+      }
+
+      if (cagedPosition === 'D' && stringName === 'D') {
+        if (rootNoteFound) {
+            drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
+            break;
+        }
+      }
+
+      console.log(`adding note {}`, notesForString[j]);
+      drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
+      
+    }
+    
+    
+  }
+    if(drawNotesParamsList.length > 0) {
+        if (cagedPosition === 'C' && stringName === 'E_HIGH' 
+        || cagedPosition === 'G' && stringName === 'G') {
+            drawNote(...drawNotesParamsList[0]);
+        } 
+        else {
+            let lastDrawNoteParams = drawNotesParamsList[drawNotesParamsList.length - 1];
+            drawNote(...lastDrawNoteParams);
         }
     }
 };
+
 
 const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumber: number, noteName: string, isRootNote: boolean, fretboardParams: any, startingFret: number) => { 
     const { fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
@@ -47,9 +99,9 @@ const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumbe
     ctx.fillText(noteName, x - fretWidth / 8, y + fretWidth / 8);
 };
 
-const addNotesToNeck = (keyName: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0, maxFret: number, oneNotePerStringOnly: boolean) => { 
+const addNotesToNeck = (keyName: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition:string, startFret: number = 0, maxFret: number, oneNotePerStringOnly: boolean, drawFromRootNoteOnly: boolean) => { 
     for (let i = 0; i < STRING_NOTES.length; i++){
-        drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(keyName, scaleInterval), keyName, fretboardParams, startFret, maxFret, oneNotePerStringOnly);
+        drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(keyName, scaleInterval), keyName, fretboardParams, cagedPosition, startFret, maxFret, oneNotePerStringOnly, drawFromRootNoteOnly);
     }
 };
 
@@ -135,89 +187,104 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
     }
 }
   
-const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, startFret: number = 0, maxFret: number, oneNotePerStringOnly: boolean) => {
+const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition: string, startFret: number = 0, maxFret: number, oneNotePerStringOnly: boolean, drawFromRootNoteOnly: boolean) => {
     const { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
         for (let string = 0; string < numStrings; string++) {
-            addNotesToNeck('C', intervals, ctx, fretboardParams, startFret, maxFret, oneNotePerStringOnly);
+            addNotesToNeck('C', intervals, ctx, fretboardParams, cagedPosition, startFret, maxFret, oneNotePerStringOnly, drawFromRootNoteOnly);
         }
-    };
+};
 
-    const DetailsSection: React.FC<DetailsSectionProps> = ({ activeChord }) => {
+const DetailsSection: React.FC<DetailsSectionProps> = ({ activeChord }) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         console.log('activeChord changed', activeChord);
         if (containerRef.current) {
-        // Clear container
-        containerRef.current.innerHTML = '';
+            // Clear container
+            containerRef.current.innerHTML = '';
 
-        const dpr = window.devicePixelRatio || 1;
-        let startingFret = 0;
+            const dpr = window.devicePixelRatio || 1;
+            //let startingFret = 0;
 
-        Array.from({ length: 5 }).forEach((_, index) => {
-            const canvas = document.createElement('canvas');
-            canvas.style.width = '200px';
-            canvas.style.height = 'auto';
-            canvas.style.boxSizing = 'border-box';
 
-            if (containerRef.current) {            
-                containerRef.current.appendChild(canvas);
+            const CAGED_STARTING_FRETS = {
+                'C': 0,
+                'A': 3,
+                'G': 5,
+                'E': 7,
+                'D': 10
+            };
+
+            // Draw 5 fretboards
+            // Array.from({ length: 5 }).forEach((_, index) => {
+            Object.entries(CAGED_STARTING_FRETS).forEach(([cagedPosition, startingFret]) => {
+                const canvas = document.createElement('canvas');
+                canvas.style.width = '200px';
+                canvas.style.height = 'auto';
+                canvas.style.boxSizing = 'border-box';
+
+                if (containerRef.current) {            
+                    containerRef.current.appendChild(canvas);
+                }
+
+                const ctx = canvas.getContext('2d');
+
+                if (ctx) {
+                    canvas.width = canvas.offsetWidth * dpr;
+                    canvas.height = canvas.offsetHeight * dpr;
+                    ctx.scale(dpr, dpr);
+
+                    const width = canvas.width;
+                    const height = canvas.height;
+                    const fretboardWidth = width * 0.85;
+                    const fretboardHeight = height;
+                    const fretboardX = (width - fretboardWidth) / 2;
+                    const fretboardY = (height - fretboardHeight) / 2;
+                    let numFrets = 4;
+                    const numStrings = 6;
+                    const stringSpacing = fretboardWidth / (numStrings - 1);
+                    const fretWidth = fretboardHeight / numFrets;
+                    const nutWidth = fretboardWidth * 0.02;
+                    const maxFret = 24;
+
+                    const fretboardParams = {
+                        width,
+                        height,
+                        fretboardX,
+                        fretboardY,
+                        fretboardWidth,
+                        fretboardHeight,
+                        numFrets,
+                        numStrings,
+                        stringSpacing,
+                        fretWidth,
+                        nutWidth
+                        };
+
+
+                    drawFretboard(ctx, fretboardParams, startingFret, maxFret);
+
+                    const userInputValues = parseUserInput(activeChord);
+                    // const intervalsString = intervalsForChordType[userInputValues.chordOrScaleType];
+                    const intervalsString = intervalsForChordType['major'];
+                    console.log('calling add notes to chord diagram')
+
+                    // TODO this should be set for chord mode so that we only draw one note per string.
+                    // For scale mode we want this to be false.
+                    let oneNotePerStringOnly = true;
+                    // TODO this should be set for chord mode so that we only draw chords from the root note.
+                    // E.g. for a c major chord, if the root note is a c on the A string then don't draw notes on the low E string.
+                    let drawFromRootNoteOnly = true;
+
+                    addNotesToChordDiagram('C', intervalsString, ctx, fretboardParams, cagedPosition, startingFret, maxFret, oneNotePerStringOnly, drawFromRootNoteOnly);
+
+                    // TODO generalise this so that numFrets can be numbers other than 5
+                    //startingFret += 5;
+                }
+
+                
+            });
             }
-
-            const ctx = canvas.getContext('2d');
-
-            if (ctx) {
-                canvas.width = canvas.offsetWidth * dpr;
-                canvas.height = canvas.offsetHeight * dpr;
-                ctx.scale(dpr, dpr);
-
-                const width = canvas.width;
-                const height = canvas.height;
-                const fretboardWidth = width * 0.85;
-                const fretboardHeight = height;
-                const fretboardX = (width - fretboardWidth) / 2;
-                const fretboardY = (height - fretboardHeight) / 2;
-                let numFrets = 5;
-                const numStrings = 6;
-                const stringSpacing = fretboardWidth / (numStrings - 1);
-                const fretWidth = fretboardHeight / numFrets;
-                const nutWidth = fretboardWidth * 0.02;
-                const maxFret = 24;
-
-                const fretboardParams = {
-                    width,
-                    height,
-                    fretboardX,
-                    fretboardY,
-                    fretboardWidth,
-                    fretboardHeight,
-                    numFrets,
-                    numStrings,
-                    stringSpacing,
-                    fretWidth,
-                    nutWidth
-                    };
-
-
-                drawFretboard(ctx, fretboardParams, startingFret, maxFret);
-
-                const userInputValues = parseUserInput(activeChord);
-                // const intervalsString = intervalsForChordType[userInputValues.chordOrScaleType];
-                const intervalsString = intervalsForChordType['major'];
-                console.log('calling add notes to chord diagram')
-
-                // TODO this should be set for chord mode so that we only draw one note per string.
-                // For scale mode we want this to be false.
-                let oneNotePerStringOnly = true;
-
-                addNotesToChordDiagram('C', intervalsString, ctx, fretboardParams, startingFret, maxFret, oneNotePerStringOnly);
-
-                startingFret += 5;
-            }
-
-            
-        });
-        }
     }, [activeChord]);
 
     return (
