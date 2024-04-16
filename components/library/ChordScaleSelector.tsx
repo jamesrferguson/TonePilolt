@@ -57,16 +57,13 @@ function ChordScaleSelector({chordMode, activeScale, activeChord, setActiveChord
 
     const handleKeySelect = useCallback((key: string): void => {
       setCurrentKey(key);
-      setCurrentScaleType(currentScale => {
-        const newValue = key + " " + currentScale;
-        if (chordMode) {
-          setActiveChord(newValue);
-        } else {
-          setActiveScale(newValue);
-        }
-        return currentScale; 
-      });
-    }, [chordMode, setActiveChord, setActiveScale]);
+      const newValue = key + " " + currentScaleType;
+      if (chordMode) {
+        setActiveChord(newValue);
+      } else {
+        setActiveScale(newValue);
+      }
+    }, [chordMode, setActiveChord, setActiveScale, currentScaleType]);
     
     const handleChordOrScaleTypeClick = useCallback((type: string): void => {
       const activeValue = currentKey + " " + type;
