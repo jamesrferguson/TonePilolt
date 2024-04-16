@@ -69,6 +69,16 @@ button.active {
   color: white;
 }
 
+.details-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.details-section canvas {
+  margin: 5px;
+}
+
 .fretboard-section canvas {
   width: 100%;
   min-width: 1000px;
@@ -78,7 +88,7 @@ button.active {
   overflow-x: auto;
 }
 
-.fretboard-section, .chord-diagram, .scale-diagram {
+.fretboard-section, .chord-diagram, .scale-diagram, .details-section {
   margin-bottom: 20px;
   padding: 20px;
   background-color: #fff;

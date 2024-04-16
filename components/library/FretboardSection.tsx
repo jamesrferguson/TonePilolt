@@ -16,7 +16,7 @@ interface FretboardParams {
     nutWidth: number;
 }
 
-const orderNotesForStartingNote = (startingNote: string) => {
+export const orderNotesForStartingNote = (startingNote: string) => {
     if (startingNote == 'E_LOW' || startingNote == 'E_HIGH') { // TODO: move this check
         startingNote = 'E';
     }
@@ -26,16 +26,16 @@ const orderNotesForStartingNote = (startingNote: string) => {
 
 const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: FretboardParams)  => {
     let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName];
-        let notesForString = orderNotesForStartingNote(stringName);
-        for (let i = 0; i <= NUMBER_OF_FRETS; i++) {
-            let j = i % 12;
-            if (notes.indexOf(notesForString[j]) > -1){
-                drawNote(ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams);
-            }
+    let notesForString = orderNotesForStartingNote(stringName);
+    for (let i = 0; i <= NUMBER_OF_FRETS; i++) {
+        let j = i % 12;
+        if (notes.indexOf(notesForString[j]) > -1){
+            drawNote(ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams);
         }
+    }
 }
 
-const notesFromScaleInterval = (keyName: string, intervals: string) => {
+export const notesFromScaleInterval = (keyName: string, intervals: string) => {
   if(keyName && intervals){
       let allNotes: string[] = orderNotesForStartingNote(keyName);
       let intervalValues: number[] = intervals.split(',').map(x => parseInt(x));
@@ -50,13 +50,13 @@ const notesFromScaleInterval = (keyName: string, intervals: string) => {
   return [];
 }
 
-const addNotesToNeck = (selectedKey: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: FretboardParams) => {
+export const addNotesToNeck = (selectedKey: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: FretboardParams) => {
     for (let i = 0; i < STRING_NOTES.length; i++){
       drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(selectedKey, scaleInterval), selectedKey, fretboardParams);
     }
 }
 
-const drawFretboardElements = (
+export const drawFretboardElements = (
   ctx: CanvasRenderingContext2D,
   fretboardParams: FretboardParams
 ) => {
@@ -203,12 +203,12 @@ function toCamelCase(words: string[]): string {
     .join('');
 }
 
-interface UserScaleOrChordInput {
+export interface UserScaleOrChordInput {
   keyName: string;
   chordOrScaleType: string;
 }
 
-function parseUserInput(input: string | undefined): UserScaleOrChordInput {
+export function parseUserInput(input: string | undefined): UserScaleOrChordInput {
   let keyName = "";
   let chordOrScaleType = "";
 
