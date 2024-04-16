@@ -88,14 +88,14 @@ const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumbe
     // Draw note circle
     ctx.beginPath();
     ctx.arc(x, y, fretWidth / 4, 0, 2 * Math.PI, false);
-    ctx.fillStyle = 'green';
+    ctx.fillStyle = isRootNote ? 'blue' : 'red';
     ctx.fill();
     ctx.lineWidth = 1;
     ctx.strokeStyle = '#003300';
     ctx.stroke();
 
     // Draw note name
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = 'white';
     ctx.font = `${fretWidth / 4}px Arial`;
     ctx.fillText(noteName, x - fretWidth / 8, y + fretWidth / 8);
 };
