@@ -1,6 +1,6 @@
 // DetailsSection.tsx
 import React, { useEffect, useRef } from 'react';
-import { parseUserInput, notesFromScaleInterval, orderNotesForStartingNote } from './FretboardSection';
+import { parseUserInput, notesFromScaleInterval, orderNotesForStartingNote, UserScaleOrChordInput } from './FretboardSection';
 import { intervalsForChordType, MAP_STRINGS_TO_STRINGNUMBER, STRING_NOTES  } from './Constants';
 
 interface DetailsSectionProps {
@@ -54,7 +54,6 @@ const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, n
         }
       }
 
-      console.log(`adding note {}`, notesForString[j]);
       drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
       
     }
@@ -198,9 +197,8 @@ const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasR
 
 const DetailsSection: React.FC<DetailsSectionProps> = ({ activeChord }) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
-
+    let userInputValues: UserScaleOrChordInput = parseUserInput(activeChord);
     useEffect(() => {
-        console.log('activeChord changed', activeChord);
         if (containerRef.current) {
             // Clear container
             containerRef.current.innerHTML = '';
@@ -233,74 +231,73 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ activeChord }) => {
 
             // Draw 5 fretboards
             // Array.from({ length: 5 }).forEach((_, index) => {
-            let selectedKey = 'F';
-            Object.entries(CAGED_STARTING_FRETS[selectedKey]).forEach(([cagedPosition, startingFret]) => {
-                const canvas = document.createElement('canvas');
-                canvas.style.width = '200px';
-                canvas.style.height = 'auto';
-                canvas.style.boxSizing = 'border-box';
+            let selectedKey = userInputValues.keyName;
+            let chordOrScaleType = userInputValues.chordOrScaleType;
+            if (selectedKey && chordOrScaleType) {
+                Object.entries(CAGED_STARTING_FRETS[selectedKey]).forEach(([cagedPosition, startingFret]) => {
+                    const canvas = document.createElement('canvas');
+                    canvas.style.width = '200px';
+                    canvas.style.height = 'auto';
+                    canvas.style.boxSizing = 'border-box';
 
-                if (containerRef.current) {            
-                    containerRef.current.appendChild(canvas);
+                    if (containerRef.current) {            
+                        containerRef.current.appendChild(canvas);
+                    }
+
+                    const ctx = canvas.getContext('2d');
+
+                    if (ctx) {
+                        canvas.width = canvas.offsetWidth * dpr;
+                        canvas.height = canvas.offsetHeight * dpr;
+                        ctx.scale(dpr, dpr);
+
+                        const width = canvas.width;
+                        const height = canvas.height;
+                        const fretboardWidth = width * 0.85;
+                        const fretboardHeight = height;
+                        const fretboardX = (width - fretboardWidth) / 2;
+                        const fretboardY = (height - fretboardHeight) / 2;
+                        let numFrets = 4;
+                        const numStrings = 6;
+                        const stringSpacing = fretboardWidth / (numStrings - 1);
+                        const fretWidth = fretboardHeight / numFrets;
+                        const nutWidth = fretboardWidth * 0.02;
+                        const maxFret = 24;
+
+                        const fretboardParams = {
+                            width,
+                            height,
+                            fretboardX,
+                            fretboardY,
+                            fretboardWidth,
+                            fretboardHeight,
+                            numFrets,
+                            numStrings,
+                            stringSpacing,
+                            fretWidth,
+                            nutWidth
+                            };
+
+
+                        drawFretboard(ctx, fretboardParams, startingFret, maxFret);
+
+                        const intervalsString = intervalsForChordType[chordOrScaleType];
+
+                        // TODO this should be set for chord mode so that we only draw one note per string.
+                        // For scale mode we want this to be false.
+                        let oneNotePerStringOnly = true;
+                        // TODO this should be set for chord mode so that we only draw chords from the root note.
+                        // E.g. for a c major chord, if the root note is a c on the A string then don't draw notes on the low E string.
+                        let drawFromRootNoteOnly = true;
+
+                        addNotesToChordDiagram(selectedKey, intervalsString, ctx, fretboardParams, cagedPosition, startingFret, maxFret, oneNotePerStringOnly, drawFromRootNoteOnly);
+
+                        // TODO generalise this so that numFrets can be numbers other than 5
+                        //startingFret += 5;
+                    }
+                    
+                });
                 }
-
-                const ctx = canvas.getContext('2d');
-
-                if (ctx) {
-                    canvas.width = canvas.offsetWidth * dpr;
-                    canvas.height = canvas.offsetHeight * dpr;
-                    ctx.scale(dpr, dpr);
-
-                    const width = canvas.width;
-                    const height = canvas.height;
-                    const fretboardWidth = width * 0.85;
-                    const fretboardHeight = height;
-                    const fretboardX = (width - fretboardWidth) / 2;
-                    const fretboardY = (height - fretboardHeight) / 2;
-                    let numFrets = 4;
-                    const numStrings = 6;
-                    const stringSpacing = fretboardWidth / (numStrings - 1);
-                    const fretWidth = fretboardHeight / numFrets;
-                    const nutWidth = fretboardWidth * 0.02;
-                    const maxFret = 24;
-
-                    const fretboardParams = {
-                        width,
-                        height,
-                        fretboardX,
-                        fretboardY,
-                        fretboardWidth,
-                        fretboardHeight,
-                        numFrets,
-                        numStrings,
-                        stringSpacing,
-                        fretWidth,
-                        nutWidth
-                        };
-
-
-                    drawFretboard(ctx, fretboardParams, startingFret, maxFret);
-
-                    const userInputValues = parseUserInput(activeChord);
-                    // const intervalsString = intervalsForChordType[userInputValues.chordOrScaleType];
-                    const intervalsString = intervalsForChordType['major'];
-                    console.log('calling add notes to chord diagram')
-
-                    // TODO this should be set for chord mode so that we only draw one note per string.
-                    // For scale mode we want this to be false.
-                    let oneNotePerStringOnly = true;
-                    // TODO this should be set for chord mode so that we only draw chords from the root note.
-                    // E.g. for a c major chord, if the root note is a c on the A string then don't draw notes on the low E string.
-                    let drawFromRootNoteOnly = true;
-
-                    addNotesToChordDiagram(selectedKey, intervalsString, ctx, fretboardParams, cagedPosition, startingFret, maxFret, oneNotePerStringOnly, drawFromRootNoteOnly);
-
-                    // TODO generalise this so that numFrets can be numbers other than 5
-                    //startingFret += 5;
-                }
-
-                
-            });
             }
     }, [activeChord]);
 

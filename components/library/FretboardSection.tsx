@@ -203,7 +203,7 @@ function toCamelCase(words: string[]): string {
     .join('');
 }
 
-interface UserScaleOrChordInput {
+export interface UserScaleOrChordInput {
   keyName: string;
   chordOrScaleType: string;
 }
