@@ -63,6 +63,8 @@ const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, n
   }
     if(drawNotesParamsList.length > 0) {
         if (cagedPosition === 'C' && stringName === 'E_HIGH' 
+        || cagedPosition === 'G' && stringName === 'G' 
+        || cagedPosition === 'E' && stringName === 'E_HIGH'
         || cagedPosition === 'G' && stringName === 'G') {
             drawNote(...drawNotesParamsList[0]);
         } 
@@ -190,7 +192,7 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
 const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition: string, startFret: number = 0, maxFret: number, oneNotePerStringOnly: boolean, drawFromRootNoteOnly: boolean) => {
     const { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
         for (let string = 0; string < numStrings; string++) {
-            addNotesToNeck('C', intervals, ctx, fretboardParams, cagedPosition, startFret, maxFret, oneNotePerStringOnly, drawFromRootNoteOnly);
+            addNotesToNeck(keyName, intervals, ctx, fretboardParams, cagedPosition, startFret, maxFret, oneNotePerStringOnly, drawFromRootNoteOnly);
         }
 };
 
@@ -206,18 +208,33 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ activeChord }) => {
             const dpr = window.devicePixelRatio || 1;
             //let startingFret = 0;
 
+            type FretMap = {
+                [key: string]: number;
+              };
 
-            const CAGED_STARTING_FRETS = {
-                'C': 0,
-                'A': 3,
-                'G': 5,
-                'E': 7,
-                'D': 10
+            type CagedStartingFrets = {
+                [key: string]: FretMap;
+              };
+
+            const CAGED_STARTING_FRETS: CagedStartingFrets = {
+                'C'  :{'C': 0, 'A': 3, 'G': 5, 'E': 8, 'D': 10},
+                'C#' :{'C': 1, 'A': 4, 'G': 6, 'E': 9, 'D': 11},
+                'D'  :{'C': 2, 'A': 5, 'G': 7, 'E': 10, 'D': 0},
+                'Eb' :{'C': 3, 'A': 6, 'G': 8, 'E': 11, 'D': 1},
+                'E'  :{'C': 4, 'A': 7, 'G': 9, 'E': 0, 'D': 2},
+                'F'  :{'C': 5, 'A': 8, 'G': 10, 'E': 1, 'D': 3},
+                'F#' :{'C': 6, 'A': 9, 'G': 11, 'E': 2, 'D': 4},
+                'G'  :{'C': 7, 'A': 10, 'G': 0, 'E': 3, 'D': 5},
+                'G#' :{'C': 8, 'A': 11, 'G': 1, 'E': 4, 'D': 6},
+                'A'  :{'C': 9, 'A': 0, 'G': 2, 'E': 5, 'D': 7},
+                'Bb' :{'C': 10, 'A': 1, 'G': 3, 'E': 6, 'D': 8},
+                'B'  :{'C': 11, 'A': 2, 'G': 4, 'E': 7, 'D': 9}
             };
 
             // Draw 5 fretboards
             // Array.from({ length: 5 }).forEach((_, index) => {
-            Object.entries(CAGED_STARTING_FRETS).forEach(([cagedPosition, startingFret]) => {
+            let selectedKey = 'F';
+            Object.entries(CAGED_STARTING_FRETS[selectedKey]).forEach(([cagedPosition, startingFret]) => {
                 const canvas = document.createElement('canvas');
                 canvas.style.width = '200px';
                 canvas.style.height = 'auto';
@@ -276,7 +293,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ activeChord }) => {
                     // E.g. for a c major chord, if the root note is a c on the A string then don't draw notes on the low E string.
                     let drawFromRootNoteOnly = true;
 
-                    addNotesToChordDiagram('C', intervalsString, ctx, fretboardParams, cagedPosition, startingFret, maxFret, oneNotePerStringOnly, drawFromRootNoteOnly);
+                    addNotesToChordDiagram(selectedKey, intervalsString, ctx, fretboardParams, cagedPosition, startingFret, maxFret, oneNotePerStringOnly, drawFromRootNoteOnly);
 
                     // TODO generalise this so that numFrets can be numbers other than 5
                     //startingFret += 5;
