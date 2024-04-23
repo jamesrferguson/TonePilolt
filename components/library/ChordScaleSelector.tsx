@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { CIRCLE_OF_FIFTHS, SCALE_TYPES } from "@/components/library/Constants";
+import { useState, useCallback, useEffect } from "react";
+import { CIRCLE_OF_FIFTHS, SCALE_TYPES, CHORD_TYPES } from "@/components/library/Constants";
 
 type KeyButtonProps = {
   dataKey: string;
@@ -30,17 +30,51 @@ function ScaleTypeButton({ typeName, onClick, isActive }: ScaleTypeButtonProps) 
   );
 }
 
-function ChordScaleSelector() {
-    const [currentKey, setCurrentKey] = useState("C");
-    const [currentScaleType, setCurrentScaleType] = useState("Major");
+type ChordScaleSelectorProps = {
+  chordMode: boolean;
+  activeScale: string;
+  activeChord: string;
+  setActiveScale: React.Dispatch<React.SetStateAction<string>>;
+  setActiveChord: React.Dispatch<React.SetStateAction<string>>;
+}
 
-    const handleKeySelect  = (key: string): void => {
-        setCurrentKey(key);
-    };
+function ChordScaleSelector({chordMode, activeScale, activeChord, setActiveChord, setActiveScale}: ChordScaleSelectorProps) {
+    const [currentKey, setCurrentKey] = useState(chordMode ? activeChord.split(' ')[0] : activeScale.split(' ')[0]);
+    const [currentScaleType, setCurrentScaleType] = useState(chordMode ? '' : activeScale.split(' ')[1]);
+    const [currentChordType, setCurrentChordType] = useState(chordMode ? activeChord.split(' ')[1] : '');
 
-    const handleScaleTypeClick = (type: string): void => {
+    useEffect(() => {
+        if (chordMode) {
+            const [key, type] = activeChord.split(' ');
+            setCurrentKey(key);
+            setCurrentChordType(type);
+        } else {
+            const [key, type] = activeScale.split(' ');
+            setCurrentKey(key);
+            setCurrentScaleType(type);
+        }
+    }, [activeScale, activeChord, chordMode]);
+
+    const handleKeySelect = useCallback((key: string): void => {
+      setCurrentKey(key);
+      const newValue = key + " " + currentScaleType;
+      if (chordMode) {
+        setActiveChord(newValue);
+      } else {
+        setActiveScale(newValue);
+      }
+    }, [chordMode, setActiveChord, setActiveScale, currentScaleType]);
+    
+    const handleChordOrScaleTypeClick = useCallback((type: string): void => {
+      const activeValue = currentKey + " " + type;
+      if (chordMode) {
+        setCurrentChordType(type);
+        setActiveChord(activeValue);
+      } else {
         setCurrentScaleType(type);
-    };
+        setActiveScale(activeValue);
+      }
+    }, [chordMode, currentKey, setActiveChord, setActiveScale]);
 
     return (
         <div className="music-selector">
@@ -57,14 +91,14 @@ function ChordScaleSelector() {
                 ))}
             </div>
             <div className="grid-container">
-                {SCALE_TYPES.map((type, index) => (
-                    <ScaleTypeButton
-                        key={index}
-                        typeName={type}
-                        onClick={handleScaleTypeClick}
-                        isActive={currentScaleType === type}
-                    />
-                ))}
+              {(chordMode ? CHORD_TYPES : SCALE_TYPES).map((type, index) => (
+                <ScaleTypeButton
+                  key={index}
+                  typeName={type}
+                  onClick={() => handleChordOrScaleTypeClick(type)}
+                  isActive={(chordMode ? currentChordType : currentScaleType) === type}
+                />
+              ))}
             </div>
         </div>
     );

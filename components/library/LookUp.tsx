@@ -6,16 +6,19 @@ type LookUpProps = {
   chords: string[];
   scales: string[];
   chordMode: boolean;
+  activeScale: string;
   setActiveScale: React.Dispatch<React.SetStateAction<string>>;
+  activeChord: string;
   setActiveChord: React.Dispatch<React.SetStateAction<string>>;
 }
 
-function LookUp ({chords, scales, chordMode, setActiveChord, setActiveScale}: LookUpProps) {
+function LookUp ({chords, scales, chordMode, activeChord, setActiveChord, activeScale, setActiveScale}: LookUpProps) {
   let [currentInputText, setInputText] = useState("");
 
-  const [query, setQuery] = useState<string>('');
+  const [query, setQuery] = useState<string>(chordMode ? activeChord : activeScale);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [lookUpList, setLookupList] = useState<string[]>(chords);
+  const [userInput, setUserInput] = useState<boolean>(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -23,16 +26,21 @@ function LookUp ({chords, scales, chordMode, setActiveChord, setActiveScale}: Lo
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
     setInputText(e.target.value);
+    setUserInput(true);
   };
 
   useEffect(() => {
-    if (query) {
+    if (query && userInput) {
       const filtered = lookUpList.filter(el => el.toLowerCase().startsWith(query.toLowerCase()));
       setSuggestions(filtered);
     }  else {
       setSuggestions([]);
     }
-  }, [query]);
+  }, [query, userInput]);
+
+  useEffect(() => {
+    setQuery(chordMode ? activeChord : activeScale);
+  }, [activeScale, activeChord, chordMode]);
 
   useEffect(() => {
     if (chordMode) {
@@ -45,6 +53,7 @@ function LookUp ({chords, scales, chordMode, setActiveChord, setActiveScale}: Lo
   const handleSuggestionClick = (suggestion: string) => {
     setQuery(suggestion);
     setSuggestions([]);
+    setUserInput(false);
   };
 
   useEffect(() => {
