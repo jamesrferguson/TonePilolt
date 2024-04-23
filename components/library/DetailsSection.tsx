@@ -13,72 +13,89 @@ const isRootNote = (note: string, rootNote: string) => {
     return note === rootNote;
 }
 
-const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, cagedPosition:string, startingFret: number, maxFret: number, chordMode: boolean) => { 
-  let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName] - 1;
-  let notesForString = orderNotesForStartingNote(stringName);
-  let drawNotesParamsList: [CanvasRenderingContext2D, number, number, string, boolean, any, number][] = [];
-
-  let rootNoteFound = false;
-  for (let i = startingFret; i <= startingFret + fretboardParams.numFrets - 1; i++) {
-    let j = i % 12;
-    if (notes.indexOf(notesForString[j]) > -1){
-      if (!chordMode) {
-        drawNote(ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret);
-      } else {
-        if (!rootNoteFound) {
-            if (isRootNote(notesForString[j], rootNote)) {
-            rootNoteFound = true;
-            }
-        } 
-        if ((cagedPosition === 'G' || cagedPosition === 'E') && stringName === 'E_LOW') {
-            if (rootNoteFound) {
-                drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
-                break;
-            }
-        }
-
-        if ((cagedPosition === 'C' || cagedPosition === 'A') && stringName === 'E_LOW') {
-            break;
-        }
-
-        if ((cagedPosition === 'C' || cagedPosition === 'A') && stringName === 'A') {
-            if (rootNoteFound) {
-                drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
-                break;
-            }
-        }
-
-        if (cagedPosition === 'D' && (stringName === 'E_LOW' || stringName === 'A')) {
-            break;
-        }
-
-        if (cagedPosition === 'D' && stringName === 'D') {
-            if (rootNoteFound) {
-                drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
-                break;
-            }
-        }
-
-        drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
-    }
-    }
-    
-    
-  }
-    if(drawNotesParamsList.length > 0 && chordMode) {
-        if (cagedPosition === 'C' && stringName === 'E_HIGH' 
-        || cagedPosition === 'G' && stringName === 'G' 
-        || cagedPosition === 'E' && stringName === 'E_HIGH'
-        || cagedPosition === 'G' && stringName === 'G') {
-            drawNote(...drawNotesParamsList[0]);
-        } 
-        else {
-            let lastDrawNoteParams = drawNotesParamsList[drawNotesParamsList.length - 1];
-            drawNote(...lastDrawNoteParams);
-        }
-    }
+type FretboardParameters = {
+    numFrets: number;
+    scaleNoteCountBack: number;
 };
 
+const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, cagedPosition:string, startingFret: number, maxFret: number, chordMode: boolean, scaleNotesPerString: number, lastNotesDrawn: string[]): string[] => { 
+    let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName] - 1;
+    let notesForString = orderNotesForStartingNote(stringName);
+    let drawNotesParamsList: [CanvasRenderingContext2D, number, number, string, boolean, any, number][] = [];
+    let stringNotes: string[] = [];
+    let rootNoteFound = false;
+    for (let i = startingFret; i <= startingFret + fretboardParams.numFrets - 1; i++) {
+      let j = i % 12;
+      if (notes.indexOf(notesForString[j]) > -1){
+        if (!chordMode) {
+          if (!lastNotesDrawn.includes(notesForString[j]) && stringNotes.length < scaleNotesPerString) {
+              drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
+              stringNotes.push(notesForString[j]);
+          }
+          
+        } else {
+          if (!rootNoteFound) {
+              if (isRootNote(notesForString[j], rootNote)) {
+                rootNoteFound = true;
+              }
+          } 
+          if ((cagedPosition === 'G' || cagedPosition === 'E') && stringName === 'E_LOW') {
+              if (rootNoteFound) {
+                  drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
+                  break;
+              }
+          }
+  
+          if ((cagedPosition === 'C' || cagedPosition === 'A') && stringName === 'E_LOW') {
+              break;
+          }
+  
+          if ((cagedPosition === 'C' || cagedPosition === 'A') && stringName === 'A') {
+              if (rootNoteFound) {
+                   drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
+                  break;
+              }
+          }
+  
+          if (cagedPosition === 'D' && (stringName === 'E_LOW' || stringName === 'A')) {
+              break;
+          }
+  
+          if (cagedPosition === 'D' && stringName === 'D') {
+              if (rootNoteFound) {
+                  drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
+                  break;
+              }
+          }
+          drawNotesParamsList.push([ctx, stringNumber, i, notesForString[j], notesForString[j] == rootNote, fretboardParams, startingFret]);
+      }
+      }
+      
+      
+    }
+      if(drawNotesParamsList.length > 0 && chordMode) {
+          if (cagedPosition === 'C' && stringName === 'E_HIGH' 
+          || cagedPosition === 'G' && stringName === 'G' 
+          || cagedPosition === 'E' && stringName === 'E_HIGH'
+          || cagedPosition === 'G' && stringName === 'G') {
+              drawNote(...drawNotesParamsList[0]);
+          } 
+          else {
+              let lastDrawNoteParams = drawNotesParamsList[drawNotesParamsList.length - 1];
+              drawNote(...lastDrawNoteParams);
+          }
+      }
+      if (!chordMode){
+          if (drawNotesParamsList.length > 0){
+              for (let i = 0; i < drawNotesParamsList.length; i++) {
+                  const item = drawNotesParamsList[i];
+                  drawNote(...item);
+              }
+          }
+          
+      }
+      return stringNotes;
+  };
 
 const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumber: number, noteName: string, isRootNote: boolean, fretboardParams: any, startingFret: number) => { 
     const { fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
@@ -105,9 +122,10 @@ const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumbe
     ctx.fillText(noteName, x - fretWidth / 8, y + fretWidth / 8);
 };
 
-const addNotesToNeck = (keyName: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition:string, startFret: number = 0, maxFret: number, chordMode: boolean) => { 
+const addNotesToNeck = (keyName: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition:string, startFret: number = 0, maxFret: number, chordMode: boolean, scaleNoteCountBack: number) => { 
+    let lastNoteDrawn: string[] = [];
     for (let i = 0; i < STRING_NOTES.length; i++){
-        drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(keyName, scaleInterval), keyName, fretboardParams, cagedPosition, startFret, maxFret, chordMode);
+        lastNoteDrawn = drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(keyName, scaleInterval), keyName, fretboardParams, cagedPosition, startFret, maxFret, chordMode, scaleNoteCountBack, lastNoteDrawn);
     }
 };
 
@@ -180,8 +198,8 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
     }
 
     // Draw fret numbers
-    ctx.fillStyle = '#000000'; // Black
-    ctx.font = '12px Arial'; // Adjust as needed
+    ctx.fillStyle = '#000000'; 
+    ctx.font = '10px Arial'; 
     for (let i = 0; i < fretNumCount; i++) {
         // ctx.fillText((startingFret + i).toString(), fretboardX - 15, fretboardY + i * fretWidth + fretWidth / 2);
         let yPos = startingFret === 0 ? fretboardY + i * fretWidth - fretWidth / 2 : fretboardY + i * fretWidth + fretWidth / 2;
@@ -193,11 +211,32 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
     }
 }
   
-const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition: string, startFret: number = 0, maxFret: number, chordMode: boolean) => {
+const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition: string, startFret: number = 0, maxFret: number, chordMode: boolean, scaleNoteCountBack: number) => {
     const { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
         for (let string = 0; string < numStrings; string++) {
-            addNotesToNeck(keyName, intervals, ctx, fretboardParams, cagedPosition, startFret, maxFret, chordMode);
+            addNotesToNeck(keyName, intervals, ctx, fretboardParams, cagedPosition, startFret, maxFret, chordMode, scaleNoteCountBack);
         }
+};
+
+const generateFretboardParameters = (chordMode: boolean, scaleType: string): FretboardParameters  => {
+    if (chordMode) {
+        return {
+            numFrets: 4,
+            scaleNoteCountBack: 1
+        };
+    } else {
+        let countBack = 3;
+        let fretCount = 7;
+        if (scaleType === 'pentatonic') {
+            countBack = 2;
+            fretCount = 5;
+        };
+
+        return {
+            numFrets: fretCount,
+            scaleNoteCountBack: countBack
+        };
+    }
 };
 
 const DetailsSection: React.FC<DetailsSectionProps> = ({ chordMode, activeChord, activeScale }) => {
@@ -217,7 +256,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ chordMode, activeChord,
                 [key: string]: FretMap;
               };
 
-            const CAGED_STARTING_FRETS: CagedStartingFrets = {
+            const CAGED_STARTING_FRETS_CHORDS: CagedStartingFrets =  {
                 'C'  :{'C': 0, 'A': 3, 'G': 5, 'E': 8, 'D': 10},
                 'C#' :{'C': 1, 'A': 4, 'G': 6, 'E': 9, 'D': 11},
                 'D'  :{'D': 0, 'C': 2, 'A': 5, 'G': 7, 'E': 10},
@@ -231,11 +270,27 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ chordMode, activeChord,
                 'Bb' :{'A': 1, 'G': 3, 'E': 6, 'D': 8, 'C': 10},
                 'B'  :{'A': 2, 'G': 4, 'E': 7, 'D': 9, 'C': 11}
             };
-
+            const CAGED_STARTING_FRETS_MODES =  {
+                'C'  :{'I': 8, 'D': 10, 'P': 11, 'L': 1, 'M': 3, 'A': 5, 'Lo': 7},
+                'C#' :{'I': 9, 'D': 11, 'P': 0, 'L': 2, 'M': 4, 'A': 6, 'Lo': 8},
+                'D'  :{'I': 10, 'D': 0, 'P': 1, 'L': 3, 'M': 5, 'A': 7, 'Lo': 9},
+                'Eb' :{'I': 11, 'D': 1, 'P': 2, 'L': 4, 'M': 6, 'A': 8, 'Lo': 10},
+                'E'  :{'I': 0, 'D': 2, 'P': 3, 'L': 5, 'M': 7, 'A': 9, 'Lo': 11},
+                'F'  :{'I': 1, 'D': 3, 'P': 4, 'L': 6, 'M': 8, 'A': 10, 'Lo': 0},
+                'F#' :{'I': 2, 'D': 4, 'P': 5, 'L': 7, 'M': 9, 'A': 11, 'Lo': 1},
+                'G'  :{'I': 3, 'D': 5, 'P': 6, 'L': 8, 'M': 10, 'A': 0, 'Lo': 2},
+                'G#' :{'I': 4, 'D': 6, 'P': 7, 'L': 9, 'M': 11, 'A': 1, 'Lo': 3},
+                'A'  :{'I': 5, 'D': 7, 'P': 8, 'L': 10, 'M': 0, 'A': 2, 'Lo': 4},
+                'Bb' :{'I': 6, 'D': 8, 'P': 9, 'L': 11, 'M': 1, 'A': 3, 'Lo': 5},
+                'B'  :{'I': 7, 'D': 9, 'P': 10, 'L': 0, 'M': 2, 'A': 4, 'Lo': 6}
+            };
             let selectedKey = userInputValues.keyName;
             let chordOrScaleType = userInputValues.chordOrScaleType;
+            let CAGED_STARTING_FRETS = CAGED_STARTING_FRETS_CHORDS;
+            if (!chordMode && chordOrScaleType !== 'pentatonic') { 
+                CAGED_STARTING_FRETS = CAGED_STARTING_FRETS_MODES;
+            }
             if (selectedKey && chordOrScaleType) {
-                console.log(`selectedKey: ${selectedKey}, chordOrScaleType: ${chordOrScaleType}`)
                 Object.entries(CAGED_STARTING_FRETS[selectedKey]).forEach(([cagedPosition, startingFret]) => {
                     const canvas = document.createElement('canvas');
                     canvas.style.width = '200px';
@@ -259,7 +314,9 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ chordMode, activeChord,
                         const fretboardHeight = height;
                         const fretboardX = (width - fretboardWidth) / 2;
                         const fretboardY = (height - fretboardHeight) / 2;
-                        let numFrets = chordMode ? 4 : 5;
+                        let fretboardParameters = generateFretboardParameters(chordMode, chordOrScaleType);
+                        let numFrets = fretboardParameters.numFrets;
+                        let scaleNoteCountBack = fretboardParameters.scaleNoteCountBack;
                         const numStrings = 6;
                         const stringSpacing = fretboardWidth / (numStrings - 1);
                         const fretWidth = fretboardHeight / numFrets;
@@ -284,19 +341,14 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ chordMode, activeChord,
                         drawFretboard(ctx, fretboardParams, startingFret, maxFret);
 
                         const intervalsString = chordMode ? intervalsForChordType[chordOrScaleType] : intervalForScaleType[chordOrScaleType];
-                        console.log(chordOrScaleType);
-                        console.log(intervalsString);
 
-                        addNotesToChordDiagram(selectedKey, intervalsString, ctx, fretboardParams, cagedPosition, startingFret, maxFret, chordMode);
-
-                        // TODO generalise this so that numFrets can be numbers other than 5
-                        //startingFret += 5;
+                        addNotesToChordDiagram(selectedKey, intervalsString, ctx, fretboardParams, cagedPosition, startingFret, maxFret, chordMode, scaleNoteCountBack);
                     }
                     
                 });
                 }
             }
-    }, [activeChord, activeScale]);
+    }, [activeChord, activeScale, chordMode]);
 
     return (
         <div className="details-section" ref={containerRef} />

@@ -3,7 +3,7 @@ import { before } from "node:test";
 export const CIRCLE_OF_FIFTHS = ["C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "Eb", "Bb", "F"];
 export const NUMBER_OF_FRETS = 22;
 export const FLAT_SYMBOL = String.fromCharCode(9837);
-export const STRING_NOTES = [ 'E_HIGH', 'B', 'G', 'D', 'A', 'E_LOW' ];
+export const STRING_NOTES = [ 'E_LOW', 'A', 'D', 'G', 'B', 'E_HIGH' ];
 export const STRING_LABELS = [ 'E', 'B', 'G', 'D', 'A', 'E' ];
 export const ALL_NOTES = [ 'A', 'Bb', 'B', 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'G#' ];
 export const MAP_STRINGS_TO_STRINGNUMBER: {[index: string]: number} = {
