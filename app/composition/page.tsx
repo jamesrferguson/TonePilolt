@@ -1,4 +1,4 @@
-export default function() {
+export default function Composition (){
     return (
         <>
             <h1>Song Composition Workspace</h1>

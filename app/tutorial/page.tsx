@@ -1,4 +1,4 @@
-export default function() {
+export default function Tutorial() {
     return (
         <>
             <h1>Tutorial and Tips</h1>
