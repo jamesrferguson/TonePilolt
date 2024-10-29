@@ -18,7 +18,7 @@ type FretboardParameters = {
     scaleNoteCountBack: number;
 };
 
-const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, cagedPosition:string, startingFret: number, maxFret: number, chordMode: boolean, scaleNotesPerString: number, lastNotesDrawn: string[]): string[] => { 
+const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, notes: string[], rootNote: string, fretboardParams: any, cagedPosition:string, startingFret: number, maxFret: number, chordMode: boolean, scaleNotesPerString: number, lastNotesDrawn: string[], dpr: number): string[] => { 
     let stringNumber = MAP_STRINGS_TO_STRINGNUMBER[stringName] - 1;
     let notesForString = orderNotesForStartingNote(stringName);
     let drawNotesParamsList: [CanvasRenderingContext2D, number, number, string, boolean, any, number][] = [];
@@ -78,18 +78,18 @@ const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, n
           || cagedPosition === 'G' && stringName === 'G' 
           || cagedPosition === 'E' && stringName === 'E_HIGH'
           || cagedPosition === 'G' && stringName === 'G') {
-              drawNote(...drawNotesParamsList[0]);
+              drawNote(...drawNotesParamsList[0], dpr);
           } 
           else {
               let lastDrawNoteParams = drawNotesParamsList[drawNotesParamsList.length - 1];
-              drawNote(...lastDrawNoteParams);
+              drawNote(...lastDrawNoteParams, dpr);
           }
       }
       if (!chordMode){
           if (drawNotesParamsList.length > 0){
               for (let i = 0; i < drawNotesParamsList.length; i++) {
                   const item = drawNotesParamsList[i];
-                  drawNote(...item);
+                  drawNote(...item, dpr);
               }
           }
           
@@ -97,7 +97,7 @@ const drawNotesForString = (ctx: CanvasRenderingContext2D, stringName: string, n
       return stringNotes;
   };
 
-const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumber: number, noteName: string, isRootNote: boolean, fretboardParams: any, startingFret: number) => { 
+const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumber: number, noteName: string, isRootNote: boolean, fretboardParams: any, startingFret: number, dpr: number) => { 
     const { fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
     const x = fretboardX + stringNumber * stringSpacing;
     let y;
@@ -109,7 +109,8 @@ const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumbe
     }
     // Draw note circle
     ctx.beginPath();
-    ctx.arc(x, y, fretWidth / 4, 0, 2 * Math.PI, false);
+    console.log("note dpr: " + dpr);
+    ctx.arc(x, y, fretWidth / 2, 0, 2 * Math.PI, false);
     ctx.fillStyle = isRootNote ? 'blue' : 'red';
     ctx.fill();
     ctx.lineWidth = 1;
@@ -118,18 +119,18 @@ const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumbe
 
     // Draw note name
     ctx.fillStyle = 'white';
-    ctx.font = `${fretWidth / 4}px Arial`;
-    ctx.fillText(noteName, x - fretWidth / 8, y + fretWidth / 8);
+    ctx.font = `${dpr === 1 ? fretWidth * dpr / 2 : fretWidth * dpr / 4}px Arial`;
+    ctx.fillText(noteName, x - fretWidth / 4, y + fretWidth / 4);
 };
 
-const addNotesToNeck = (keyName: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition:string, startFret: number = 0, maxFret: number, chordMode: boolean, scaleNoteCountBack: number) => { 
+const addNotesToNeck = (keyName: string, scaleInterval: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition:string, startFret: number = 0, maxFret: number, chordMode: boolean, scaleNoteCountBack: number, dpr: number) => { 
     let lastNoteDrawn: string[] = [];
     for (let i = 0; i < STRING_NOTES.length; i++){
-        lastNoteDrawn = drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(keyName, scaleInterval), keyName, fretboardParams, cagedPosition, startFret, maxFret, chordMode, scaleNoteCountBack, lastNoteDrawn);
+        lastNoteDrawn = drawNotesForString(ctx, STRING_NOTES[i], notesFromScaleInterval(keyName, scaleInterval), keyName, fretboardParams, cagedPosition, startFret, maxFret, chordMode, scaleNoteCountBack, lastNoteDrawn, dpr);
     }
 };
 
-const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, startingFret: number, maxFret: number) => { 
+const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, startingFret: number, maxFret: number, dpr: number) => { 
     let { width, height, fretboardX, fretboardY, fretboardWidth, fretboardHeight, numFrets, numStrings, stringSpacing, fretWidth, nutWidth } = fretboardParams;
 
     // Define the color of the fretboard
@@ -146,7 +147,7 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
     const nutColor = '#A9A9A9'; // White
     const nutHeight = 0.25 * fretWidth; // adjust this value as needed
 
-    const fretNumCount = numFrets;;
+    const fretNumCount = numFrets;
 
     if (startingFret === 0) {
         numFrets -= 1;
@@ -199,7 +200,7 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
 
     // Draw fret numbers
     ctx.fillStyle = '#000000'; 
-    ctx.font = '10px Arial'; 
+    ctx.font = `${10 * dpr}px Arial`;
     for (let i = 0; i < fretNumCount; i++) {
         // ctx.fillText((startingFret + i).toString(), fretboardX - 15, fretboardY + i * fretWidth + fretWidth / 2);
         let yPos = startingFret === 0 ? fretboardY + i * fretWidth - fretWidth / 2 : fretboardY + i * fretWidth + fretWidth / 2;
@@ -207,14 +208,14 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
         if (i + startingFret === 0) continue;
 
         // Draw the fret number
-        ctx.fillText((i + startingFret).toString(), fretboardX - 15, yPos);
+        ctx.fillText((i + startingFret).toString(), fretboardX - 15 * dpr, yPos);
     }
 }
   
-const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition: string, startFret: number = 0, maxFret: number, chordMode: boolean, scaleNoteCountBack: number) => {
+const addNotesToChordDiagram = (keyName: string, intervals: string, ctx: CanvasRenderingContext2D, fretboardParams: any, cagedPosition: string, startFret: number = 0, maxFret: number, chordMode: boolean, scaleNoteCountBack: number, dpr: number) => {
     const { numFrets, numStrings, fretboardX, fretboardY, fretWidth, stringSpacing } = fretboardParams;
         for (let string = 0; string < numStrings; string++) {
-            addNotesToNeck(keyName, intervals, ctx, fretboardParams, cagedPosition, startFret, maxFret, chordMode, scaleNoteCountBack);
+            addNotesToNeck(keyName, intervals, ctx, fretboardParams, cagedPosition, startFret, maxFret, chordMode, scaleNoteCountBack, dpr);
         }
 };
 
@@ -247,7 +248,6 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ chordMode, activeChord,
             // Clear container
             containerRef.current.innerHTML = '';
             const dpr = window.devicePixelRatio || 1;
-
             type FretMap = {
                 [key: string]: number;
               };
@@ -293,21 +293,21 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ chordMode, activeChord,
             if (selectedKey && chordOrScaleType) {
                 Object.entries(CAGED_STARTING_FRETS[selectedKey]).forEach(([cagedPosition, startingFret]) => {
                     const canvas = document.createElement('canvas');
-                    canvas.style.width = '200px';
-                    canvas.style.height = 'auto';
+                    canvas.style.width = '250px';
+                    canvas.style.height = '175px';
                     canvas.style.boxSizing = 'border-box';
 
                     if (containerRef.current) {            
                         containerRef.current.appendChild(canvas);
                     }
 
+                    const rect = canvas.getBoundingClientRect();
+                    canvas.width = rect.width * dpr;
+                    canvas.height = rect.height * dpr;
+
                     const ctx = canvas.getContext('2d');
 
                     if (ctx) {
-                        canvas.width = canvas.offsetWidth * dpr;
-                        canvas.height = canvas.offsetHeight * dpr;
-                        ctx.scale(dpr, dpr);
-
                         const width = canvas.width;
                         const height = canvas.height;
                         const fretboardWidth = width * 0.85;
@@ -338,11 +338,11 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ chordMode, activeChord,
                             };
 
 
-                        drawFretboard(ctx, fretboardParams, startingFret, maxFret);
+                        drawFretboard(ctx, fretboardParams, startingFret, maxFret, dpr);
 
                         const intervalsString = chordMode ? intervalsForChordType[chordOrScaleType] : intervalForScaleType[chordOrScaleType];
 
-                        addNotesToChordDiagram(selectedKey, intervalsString, ctx, fretboardParams, cagedPosition, startingFret, maxFret, chordMode, scaleNoteCountBack);
+                        addNotesToChordDiagram(selectedKey, intervalsString, ctx, fretboardParams, cagedPosition, startingFret, maxFret, chordMode, scaleNoteCountBack, dpr);
                     }
                     
                 });
