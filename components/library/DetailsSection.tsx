@@ -350,7 +350,7 @@ const DetailsSection: React.FC<DetailsSectionProps> = ({ chordMode, activeChord,
     }, [activeChord, activeScale, chordMode]);
 
     return (
-        <div className="details-section" ref={containerRef} />
+        <div className="details-section scale-container" ref={containerRef} />
     );
 };
 

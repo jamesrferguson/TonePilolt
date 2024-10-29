@@ -77,7 +77,7 @@ function ChordScaleSelector({chordMode, activeScale, activeChord, setActiveChord
     }, [chordMode, currentKey, setActiveChord, setActiveScale]);
 
     return (
-        <div className="music-selector">
+        <div className="music-selector scale-container">
             <div className="circle-container">
                 <div className="circle-center-label">Keys</div>
                 {CIRCLE_OF_FIFTHS.map((key, index) => (

@@ -270,7 +270,7 @@ export default function FretboardSection({chordMode, activeScale, activeChord}:F
     useCanvasResize(drawFretboard, containerRef);
 
     return (
-      <div className="fretboard-section" ref={containerRef}>
+      <div className="fretboard-section scale-container" ref={containerRef}>
         <canvas style={{ width: '100%', height: 'auto' }} />
       </div>
     );
