@@ -227,7 +227,13 @@ export default function FretboardSection({chordMode, activeScale, activeChord}:F
 
     const drawFretboard = (ctx: CanvasRenderingContext2D) => {
       if (containerRef.current && containerRef.current.children[0]) {
+        const dpr = window.devicePixelRatio || 1;
         const canvas = containerRef.current.children[0] as HTMLCanvasElement;
+
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        console.log('dpr is: ', dpr);
         const width = canvas.width;
         const height = width / 4.3333;
         const fretboardWidth = width * 0.85;

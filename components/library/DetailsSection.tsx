@@ -109,7 +109,6 @@ const drawNote = (ctx: CanvasRenderingContext2D, stringNumber: number, fretNumbe
     }
     // Draw note circle
     ctx.beginPath();
-    console.log("note dpr: " + dpr);
     ctx.arc(x, y, fretWidth / 2, 0, 2 * Math.PI, false);
     ctx.fillStyle = isRootNote ? 'blue' : 'red';
     ctx.fill();
@@ -175,8 +174,8 @@ const drawFretboard = (ctx: CanvasRenderingContext2D, fretboardParams: any, star
             if (i + startingFret === 12 || i + startingFret === 24) {
                 const markingY = fretboardY + i * fretWidth + fretWidth / 2;
                 ctx.beginPath();
-                ctx.arc(fretboardX - 30 + fretboardWidth / 2, markingY, fretMarkingRadius, 0, 2 * Math.PI);
-                ctx.arc(fretboardX + 30 + fretboardWidth / 2, markingY, fretMarkingRadius, 0, 2 * Math.PI);
+                ctx.arc(fretboardX - 30 * dpr + fretboardWidth / 2, markingY, fretMarkingRadius, 0, 2 * Math.PI);
+                ctx.arc(fretboardX + 30 * dpr + fretboardWidth / 2, markingY, fretMarkingRadius, 0, 2 * Math.PI);
                 ctx.fillStyle = fretMarkingColor;
                 ctx.fill();
                 ctx.closePath();
