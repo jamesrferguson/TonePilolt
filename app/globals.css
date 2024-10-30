@@ -73,6 +73,16 @@ button.active {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  overflow-x: auto;
+  background-color: var(--selector-bg-color);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20px;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin-top: 2rem;
 }
 
 .details-section canvas {
@@ -86,6 +96,15 @@ button.active {
 
 .fretboard-section {
   overflow-x: auto;
+  background-color: var(--selector-bg-color);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20px;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin-top: 2rem;
 }
 
 .fretboard-section, .chord-diagram, .scale-diagram, .details-section {
@@ -172,7 +191,7 @@ body {
   font-family: 'Arial', sans-serif;
 }
 
-.scale-container {
+.music-selector {
   background-color: var(--selector-bg-color);
   display: flex;
   justify-content: space-around;
