@@ -25,11 +25,14 @@ export default function Library() {
 
     return (
         <>
+        <div className="library">
+            <h1>Chord and Scale Library</h1>
             <ModeSelector chordMode={chordMode} setChordMode={setChordMode} />
             <LookUp chords={chords} scales={scales} chordMode={chordMode} activeScale={activeScale} setActiveScale={setActiveScale} activeChord={activeChord} setActiveChord={setActiveChord} />
             <ChordScaleSelector chordMode={chordMode} activeScale={activeScale} setActiveScale={setActiveScale} activeChord={activeChord} setActiveChord={setActiveChord} />
             <DetailsSection chordMode={chordMode} activeChord={activeChord} activeScale={activeScale}></DetailsSection>
             <FretboardSection chordMode={chordMode} activeScale={activeScale} activeChord={activeChord}/>
+        </div>
         </>
     )
 };
